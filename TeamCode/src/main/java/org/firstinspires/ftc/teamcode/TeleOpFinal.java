@@ -16,8 +16,6 @@ public class TeleOpFinal extends LinearOpMode {
     DcMotorEx leftBack;
     DcMotorEx rightFront;
     DcMotorEx rightBack;
-    CRServo conveyer;
-    DcMotorEx sweep;
     //Servo launcher;
 
     @Override
@@ -33,18 +31,13 @@ public class TeleOpFinal extends LinearOpMode {
         leftBack = hardwareMap.get(DcMotorEx.class, "leftBack");
         rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
         rightBack = hardwareMap.get(DcMotorEx.class, "rightBack");
-        conveyer = hardwareMap.get(CRServo.class, "conveyer");
-        sweep = hardwareMap.get(DcMotorEx.class, "sweep");
-        
-        //launcher = hardwareMap.get(Servo.class, "launcher");
+
         
         // PIDF coefficients are for sustaining a specific velocity
         // leftFront.setVelocityPIDFCoefficients(1.057, 0.1057, 0, 10.57);
         // leftBack.setVelocityPIDFCoefficients(1.057, 0.1057, 0, 10.57);
         // rightFront.setVelocityPIDFCoefficients(1.057, 0.1057, 0, 10.57);
-        // rightBack.setVelocityPIDFCoefficients(1.057, 0.1057, 0, 10.57);
-        // conveyer.setVelocityPIDFCoefficients(1.22, 0.122, 0, 12.2);
-        sweep.setVelocityPIDFCoefficients(1.22, 0.122, 0, 12.2);
+        // rightBack.setVelocityPIDFCoefficients(1.057, 0.1057, 0, 10.57)
         
         //Max V for new motors = 3100.0
         //newMotor.setVelocityPIDFCoefficients(1.057, 0.1057, 0, 10.57);
@@ -59,10 +52,10 @@ public class TeleOpFinal extends LinearOpMode {
 
         while (opModeIsActive()) {
             // Variables
-            boolean reset = false;
-            double strafe = -gamepad1.left_stick_x;
-            double drive = gamepad1.left_stick_y;
-            double rotate = gamepad1.right_stick_x;
+            //Subtracting 0.5 to decrease sensitivity for testing
+            double strafe = -gamepad1.left_stick_x-0.5;
+            double drive = gamepad1.left_stick_y-0.5;
+            double rotate = gamepad1.right_stick_x-0.5;
             
             // Allows gamepad2 to take over driving
             if (gamepad2.left_bumper) {
@@ -70,17 +63,7 @@ public class TeleOpFinal extends LinearOpMode {
                 drive = gamepad2.left_stick_y;
                 rotate = gamepad2.right_stick_x;
             }
-            
-            // Controls conveyer speeds
-            if (gamepad1.right_trigger < 0.80 && gamepad1.right_trigger != 0.0) {
-                conveyer.setPower(gamepad1.right_trigger);
-            }
-            else if (gamepad1.right_trigger == 1.0) {
-                conveyer.setPower(0.80);
-            }
-            else if (gamepad1.right_trigger < 0.03) {
-                conveyer.setPower(0);
-            }
+
 
             drive(drive, strafe, rotate);
             
@@ -92,30 +75,8 @@ public class TeleOpFinal extends LinearOpMode {
             telemetry.addData("Right Front Power", rightFront.getPower());
             telemetry.addData("Left Back Power", leftBack.getPower());
             telemetry.addData("Right Back Power", rightBack.getPower());
-            
-            
-            //sweep.setVelocity(conveyerSpeed);
-            
-            telemetry.addData("Conveyer Power", conveyer.getPower());
-            
-            if (gamepad1.y || gamepad2.y) {
-                reset = true;
-            }
-            telemetry.addData("Reset", reset);
-            
-         /*   if (gamepad1.ps || gamepad2.ps) {
-                if (launcher.getPosition() == 0 && !reset) {
-                    launcher.setPosition(1);
-                }
-                if (launcher.getPosition() == 1 && reset) {
-                    launcher.setPosition(0);
-                }
-            }
-            
-            telemetry.addData("Launcher Position", launcher.getPosition());
-            
-            telemetry.update();
-            */
+
+
         } // While op mode is active
     } // Run Op Mode
     
