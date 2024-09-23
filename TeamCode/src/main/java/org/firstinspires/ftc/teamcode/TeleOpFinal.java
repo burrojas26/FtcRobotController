@@ -81,6 +81,7 @@ public class TeleOpFinal extends LinearOpMode {
     } // Run Op Mode
     
     //Functions
+    //https://youtu.be/gnSW2QpkGXQ?si=S0n82yAB5Zl1MYK9 (shows a more complex method for programming mechanum wheels)
     public void drive(double drive, double strafe, double rotate) {
         // The percent variable is used to decrease the power by that percent
         double percent = 20.0;
