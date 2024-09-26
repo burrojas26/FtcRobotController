@@ -41,13 +41,34 @@ public class updatedDriveTest extends LinearOpMode {
             double x = gamepad1.left_stick_x;
             double y = -gamepad1.left_stick_y;
             double turn = gamepad1.right_stick_x;
-            double percent = 0;
+            double percent = 50;
 
             // Allows gamepad2 to take over driving
             if (gamepad2.left_bumper) {
                 x = gamepad2.left_stick_x;
                 y = -gamepad2.left_stick_y;
                 turn = gamepad2.right_stick_x;
+            }
+
+            if (gamepad1.y) {
+                x = 0;
+                y = 1;
+                turn = 0;
+            }
+            if (gamepad1.a) {
+                x = 0;
+                y = -1;
+                turn = 0;
+            }
+            if (gamepad1.b) {
+                x = 1;
+                y = 0;
+                turn = 0;
+            }
+            if (gamepad1.x) {
+                x = -1;
+                y = 0;
+                turn = 0;
             }
 
             //calculating theta and power for driving function
@@ -100,9 +121,17 @@ public class updatedDriveTest extends LinearOpMode {
             rightBackPower /= power + turn;
         }
 
-        leftFrontPower -= leftFrontPower*(percent/100);
-        rightFrontPower -= rightFrontPower*(percent/100);
-        leftBackPower -= leftBackPower*(percent/100);
-        rightBackPower -= rightBackPower*(percent/100);
+        //sets the power to an inputted percent to control sensitivity
+        leftFrontPower *= percent/100;
+        rightFrontPower *= percent/100;
+        leftBackPower *= percent/100;
+        rightBackPower *= percent/100;
+
+        // sets the motors to the calculated values
+        leftFront.setPower(leftFrontPower);
+        rightFront.setPower(rightFrontPower);
+        leftBack.setPower(leftBackPower);
+        rightBack.setPower(rightBackPower);
+        telemetry.update();
     }
 }
