@@ -96,7 +96,7 @@ public class updatedDriveTest extends LinearOpMode {
             telemetry.addData("Right Front Power", rightFront.getPower());
             telemetry.addData("Left Back Power", leftBack.getPower());
             telemetry.addData("Right Back Power", rightBack.getPower());
-
+            telemetry.update();
 
         } // While op mode is active
     } // Run Op Mode
@@ -132,6 +132,5 @@ public class updatedDriveTest extends LinearOpMode {
         rightFront.setPower(rightFrontPower);
         leftBack.setPower(leftBackPower);
         rightBack.setPower(rightBackPower);
-        telemetry.update();
     }
 }
