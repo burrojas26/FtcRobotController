@@ -53,9 +53,10 @@ public class TeleOpFinal extends LinearOpMode {
         while (opModeIsActive()) {
             // Variables
             //Subtracting 0.5 to decrease sensitivity for testing
-            double strafe = -gamepad1.left_stick_x-0.5;
-            double drive = gamepad1.left_stick_y-0.5;
-            double rotate = gamepad1.right_stick_x-0.5;
+            double strafe = -gamepad1.left_stick_x;
+            double drive = gamepad1.left_stick_y;
+            double rotate = gamepad1.right_stick_x;
+            double percent = 0;
             
             // Allows gamepad2 to take over driving
             if (gamepad2.left_bumper) {
@@ -64,8 +65,15 @@ public class TeleOpFinal extends LinearOpMode {
                 rotate = gamepad2.right_stick_x;
             }
 
+            if (gamepad1.dpad_up) {
+                percent+=10;
+            }
 
-            drive(drive, strafe, rotate);
+            if (gamepad1.dpad_down) {
+                percent-=10;
+            }
+
+            drive(drive, strafe, rotate, percent);
             
             // adding telemetry data
             telemetry.addData("Drive", drive);
@@ -82,9 +90,8 @@ public class TeleOpFinal extends LinearOpMode {
     
     //Functions
     //https://youtu.be/gnSW2QpkGXQ?si=S0n82yAB5Zl1MYK9 (shows a more complex method for programming mechanum wheels)
-    public void drive(double drive, double strafe, double rotate) {
+    public void drive(double drive, double strafe, double rotate, double percent) {
         // The percent variable is used to decrease the power by that percent
-        double percent = 20.0;
         // Algorithm created by ChatGPT
         double frontLeftPower = drive + strafe - rotate;
         double frontRightPower = -drive + strafe - rotate;
