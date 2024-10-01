@@ -65,12 +65,29 @@ public class TeleOpFinal extends LinearOpMode {
                 rotate = gamepad2.right_stick_x;
             }
 
-            if (gamepad1.x) {
+            if (gamepad1.y) {
                 drive = 1;
                 strafe = 0;
                 rotate = 0;
             }
 
+            if (gamepad1.a) {
+                drive = -1;
+                strafe = 0;
+                rotate = 0;
+            }
+
+            if (gamepad1.b) {
+                drive = 0;
+                strafe = 1;
+                rotate = 0;
+            }
+
+            if (gamepad1.x) {
+                drive = 0;
+                strafe = -1;
+                rotate = 0;
+            }
             if (gamepad1.dpad_up) {
                 percent+=10;
             }
