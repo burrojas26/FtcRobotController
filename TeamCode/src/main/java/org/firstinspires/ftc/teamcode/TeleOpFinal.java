@@ -89,12 +89,12 @@ public class TeleOpFinal extends LinearOpMode {
                 rotate = gamepad2.right_stick_x;
             }
 
-            if (gamepad1.dpad_up) {
-                percent+=10;
+            if (gamepad1.dpad_up && percent < 100) {
+                percent+=1;
             }
 
-            if (gamepad1.dpad_down) {
-                percent-=10;
+            if (gamepad1.dpad_down && percent > 1) {
+                percent-=1;
             }
 
             drive(drive, strafe, rotate, percent);
@@ -103,6 +103,7 @@ public class TeleOpFinal extends LinearOpMode {
             telemetry.addData("Drive", drive);
             telemetry.addData("Strafe", strafe);
             telemetry.addData("Rotate", rotate);
+            telemetry.addData("Percent", percent);
             telemetry.addData("Left Front Power", leftFront.getPower());
             telemetry.addData("Right Front Power", rightFront.getPower());
             telemetry.addData("Left Back Power", leftBack.getPower());
