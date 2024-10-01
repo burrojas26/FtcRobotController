@@ -91,10 +91,16 @@ public class TeleOpFinal extends LinearOpMode {
 
             if (gamepad1.dpad_up && percent < 100) {
                 percent+=1;
+                if (!gamepad1.atRest()) {
+                    break;
+                }
             }
 
             if (gamepad1.dpad_down && percent > 1) {
                 percent-=1;
+                if (!gamepad1.atRest()) {
+                    break;
+                }
             }
 
             drive(drive, strafe, rotate, percent);
