@@ -50,26 +50,6 @@ public class updatedDriveTest extends LinearOpMode {
                 turn = gamepad2.right_stick_x;
             }
 
-            if (gamepad1.y) {
-                x = 0;
-                y = 1;
-                turn = 0;
-            }
-            if (gamepad1.a) {
-                x = 0;
-                y = -1;
-                turn = 0;
-            }
-            if (gamepad1.b) {
-                x = 1;
-                y = 0;
-                turn = 0;
-            }
-            if (gamepad1.x) {
-                x = -1;
-                y = 0;
-                turn = 0;
-            }
 
             //calculating theta and power for driving function
             double theta = Math.atan2(y, x);

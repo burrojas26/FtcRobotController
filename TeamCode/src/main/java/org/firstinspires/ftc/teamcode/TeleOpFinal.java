@@ -133,12 +133,13 @@ public class TeleOpFinal extends LinearOpMode {
             backLeftPower /= max;
             backRightPower /= max;
         }
-        
+
         if (!gamepad1.left_stick_button) {
-            frontLeftPower -= frontLeftPower*(percent/100);
-            frontRightPower -= frontRightPower*(percent/100);
-            backLeftPower -= backLeftPower*(percent/100);
-            backRightPower -= backRightPower*(percent/100);
+            //sets the power to an inputted percent to control sensitivity
+            frontLeftPower *= percent/100;
+            frontRightPower *= percent/100;
+            backLeftPower *= percent/100;
+            backRightPower *= percent/100;
         }
         
         // Output the safe vales to the motor drives.
