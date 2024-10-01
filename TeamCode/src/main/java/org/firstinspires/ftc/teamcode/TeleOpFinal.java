@@ -57,13 +57,6 @@ public class TeleOpFinal extends LinearOpMode {
             double strafe = -gamepad1.left_stick_x;
             double drive = gamepad1.left_stick_y;
             double rotate = gamepad1.right_stick_x;
-            
-            // Allows gamepad2 to take over driving
-            if (gamepad2.left_bumper) {
-                strafe = -gamepad2.left_stick_x;
-                drive = gamepad2.left_stick_y;
-                rotate = gamepad2.right_stick_x;
-            }
 
             if (gamepad1.y) {
                 drive = 1;
@@ -88,6 +81,14 @@ public class TeleOpFinal extends LinearOpMode {
                 strafe = -1;
                 rotate = 0;
             }
+
+            // Allows gamepad2 to take over driving
+            if (gamepad2.left_bumper) {
+                strafe = -gamepad2.left_stick_x;
+                drive = gamepad2.left_stick_y;
+                rotate = gamepad2.right_stick_x;
+            }
+
             if (gamepad1.dpad_up) {
                 percent+=10;
             }
