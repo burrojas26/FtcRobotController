@@ -1,11 +1,14 @@
 package org.firstinspires.ftc.teamcode;
 
+
+//From ftclib
+import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+//From normal ftc library
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.CRServo;
-
-
 
 @TeleOp
 
@@ -48,24 +51,27 @@ public class TeleOpFinal extends LinearOpMode {
         leftBack.setDirection(DcMotorEx.Direction.FORWARD);
         leftFront.setDirection(DcMotorEx.Direction.REVERSE);
 
+        //Instance of class GamepadEx from ftclib
+        //Allows for easier control of button actions
+        GamepadEx gamepadOne = new GamepadEx(gamepad1);
+
         waitForStart();
 
         double percent = 0;
         while (opModeIsActive()) {
             // Variables
-            //Subtracting 0.5 to decrease sensitivity for testing
             double strafe = -gamepad1.left_stick_x;
             double drive = gamepad1.left_stick_y;
             double rotate = gamepad1.right_stick_x;
 
             if (gamepad1.y) {
-                drive = 1;
+                drive = -1;
                 strafe = 0;
                 rotate = 0;
             }
 
             if (gamepad1.a) {
-                drive = -1;
+                drive = 1;
                 strafe = 0;
                 rotate = 0;
             }
@@ -89,18 +95,13 @@ public class TeleOpFinal extends LinearOpMode {
                 rotate = gamepad2.right_stick_x;
             }
 
-            if (gamepad1.dpad_up && percent < 100) {
+            //Allows the user to control the percentage of speed based on the inputs from the dpad
+            if (gamepadOne.wasJustPressed(GamepadKeys.Button.DPAD_UP) && percent < 100) {
                 percent+=1;
-                if (!gamepad1.atRest()) {
-                    break;
-                }
             }
 
-            if (gamepad1.dpad_down && percent > 1) {
+            if (gamepadOne.wasJustPressed(GamepadKeys.Button.DPAD_DOWN) && percent > 0) {
                 percent-=1;
-                if (!gamepad1.atRest()) {
-                    break;
-                }
             }
 
             drive(drive, strafe, rotate, percent);
