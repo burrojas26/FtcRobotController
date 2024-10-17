@@ -1,3 +1,5 @@
+// This file does not work at the current time 10/17/24
+
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;

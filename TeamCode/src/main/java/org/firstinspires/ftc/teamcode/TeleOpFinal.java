@@ -1,3 +1,9 @@
+/**
+ * @author Jasper Burroughs
+ * This is the final program for the teleop period in the 2024-25 competition (Into the deep)
+ */
+
+
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
