@@ -17,6 +17,9 @@ public class MotorTest extends LinearOpMode {
 
     public void runOpMode() {
         motor = hardwareMap.get(DcMotorEx.class, "slide");
+        motor.setPower(gamepad1.left_stick_y);
+        telemetry.addData("Ticks: ", motor.getCurrentPosition());
+        telemetry.update();
         //Code for controlling the motor
     }
 }

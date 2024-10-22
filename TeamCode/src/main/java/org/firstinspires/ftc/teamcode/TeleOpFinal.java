@@ -56,7 +56,7 @@ public class TeleOpFinal extends LinearOpMode {
 
         waitForStart();
 
-        double percent = 0;
+        double percent = 30;
         while (opModeIsActive()) {
             // Variables
             //Subtracting 0.5 to decrease sensitivity for testing
@@ -93,20 +93,6 @@ public class TeleOpFinal extends LinearOpMode {
                 strafe = -gamepad2.left_stick_x;
                 drive = gamepad2.left_stick_y;
                 rotate = gamepad2.right_stick_x;
-            }
-
-            if (gamepad1.dpad_up && percent < 100) {
-                percent+=1;
-                if (!gamepad1.atRest()) {
-                    break;
-                }
-            }
-
-            if (gamepad1.dpad_down && percent > 1) {
-                percent-=1;
-                if (!gamepad1.atRest()) {
-                    break;
-                }
             }
 
             drive(drive, strafe, rotate, percent);
