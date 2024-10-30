@@ -62,9 +62,6 @@ public class TeleOpFinal extends LinearOpMode {
         hand.setDirection(Servo.Direction.FORWARD);
 
         while (opModeIsActive()) {
-            // Sets the past gamepad positioning after each pass of while loop to account for newly pressed buttons
-            pastGP.copy(gamepad1);
-
             /*
             Getting inputs for driving
             If wheels are installed correctly (they make an x) and not upside down,
@@ -120,6 +117,9 @@ public class TeleOpFinal extends LinearOpMode {
                 percent -= 5;
             }
 
+            // Sets the past gamepad positioning after each pass of while loop to account for newly pressed buttons
+            pastGP.copy(gamepad1);
+
             // Calls drive function
             drive(drive, strafe, rotate, percent);
             
@@ -143,9 +143,9 @@ public class TeleOpFinal extends LinearOpMode {
         // The percent variable is used to set the motor power to that percent
         // Algorithm adapted from ChatGPT
         double frontLeftPower = drive + strafe + rotate;
-        double frontRightPower = -drive - strafe + rotate;
+        double frontRightPower = drive - strafe - rotate;
         double backLeftPower = drive - strafe + rotate;
-        double backRightPower = -drive + strafe + rotate;
+        double backRightPower = drive + strafe - rotate;
 
         // Normalize the values so no value exceeds 1.0
         double max = Math.max(Math.abs(frontLeftPower), Math.abs(frontRightPower));
@@ -159,7 +159,7 @@ public class TeleOpFinal extends LinearOpMode {
             backRightPower /= max;
         }
 
-        if (!gamepad1.left_stick_button) {
+        if (!gamepad1.left_bumper) {
             //sets the power to an inputted percent to control sensitivity
             frontLeftPower *= percent/100;
             frontRightPower *= percent/100;
