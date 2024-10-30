@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.CRServo;
-
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 
 @TeleOp
@@ -49,10 +49,10 @@ public class TeleOpFinal extends LinearOpMode {
         //newMotor.setVelocityPIDFCoefficients(1.057, 0.1057, 0, 10.57);
         
         //Need to reverse motors on one side
-        leftFront.setDirection(DcMotorEx.Direction.FORWARD);
-        rightFront.setDirection(DcMotorEx.Direction.FORWARD);
+        leftFront.setDirection(DcMotorEx.Direction.FORWARD); //reverse
+        rightFront.setDirection(DcMotorEx.Direction.FORWARD); //reverse
         leftBack.setDirection(DcMotorEx.Direction.FORWARD);
-        leftFront.setDirection(DcMotorEx.Direction.FORWARD);
+        rightBack.setDirection(DcMotorEx.Direction.FORWARD);
 
         waitForStart();
 
@@ -95,7 +95,7 @@ public class TeleOpFinal extends LinearOpMode {
                 rotate = gamepad2.right_stick_x;
             }
 
-            drive(drive, strafe, rotate, percent);
+            drive(rotate, strafe, drive, percent);
             
             // adding telemetry data
             telemetry.addData("Drive", drive);
@@ -116,9 +116,9 @@ public class TeleOpFinal extends LinearOpMode {
     public void drive(double drive, double strafe, double rotate, double percent) {
         // The percent variable is used to decrease the power by that percent
         // Algorithm created by ChatGPT
-        double frontLeftPower = drive + strafe - rotate;
-        double frontRightPower = -drive + strafe - rotate;
-        double backLeftPower = -drive + strafe + rotate;
+        double frontLeftPower = drive + strafe + rotate;
+        double frontRightPower = drive - strafe - rotate;
+        double backLeftPower = drive - strafe + rotate;
         double backRightPower = drive + strafe - rotate;
 
         // Normalize the values so no value exceeds 1.0
