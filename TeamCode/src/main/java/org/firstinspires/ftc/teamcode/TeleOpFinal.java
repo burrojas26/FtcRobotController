@@ -50,13 +50,13 @@ public class TeleOpFinal extends LinearOpMode {
         
         //Need to reverse motors on one side
         leftFront.setDirection(DcMotorEx.Direction.FORWARD);
-        rightFront.setDirection(DcMotorEx.Direction.REVERSE);
+        rightFront.setDirection(DcMotorEx.Direction.FORWARD);
         leftBack.setDirection(DcMotorEx.Direction.FORWARD);
-        leftFront.setDirection(DcMotorEx.Direction.REVERSE);
+        leftFront.setDirection(DcMotorEx.Direction.FORWARD);
 
         waitForStart();
 
-        double percent = 30;
+        double percent = 65;
         while (opModeIsActive()) {
             // Variables
             //Subtracting 0.5 to decrease sensitivity for testing

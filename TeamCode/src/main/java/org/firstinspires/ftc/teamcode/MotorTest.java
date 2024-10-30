@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.CRServo;
 
@@ -17,9 +18,31 @@ public class MotorTest extends LinearOpMode {
 
     public void runOpMode() {
         motor = hardwareMap.get(DcMotorEx.class, "slide");
-        motor.setPower(gamepad1.left_stick_y);
-        telemetry.addData("Ticks: ", motor.getCurrentPosition());
-        telemetry.update();
-        //Code for controlling the motor
+        motor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+
+        waitForStart();
+        while (opModeIsActive()) {
+            if (gamepad1.x) {
+                motor.setVelocity(0);
+            }
+            if(gamepad1.y) {
+                motor.setTargetPosition(-2800);
+                motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                motor.setVelocity(4000);
+            }
+            if(gamepad1.a) {
+                motor.setTargetPosition(0);
+                motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                motor.setVelocity(4000);
+            }
+
+            //motor.setPower(0.4*gamepad1.left_stick_y)
+            telemetry.addData("Velocity: ", motor.getVelocity());
+            telemetry.addData("Ticks: ", motor.getCurrentPosition());
+            telemetry.update();
+            //Code for controlling the motor
+        }
+
     }
 }
+
