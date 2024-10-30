@@ -36,11 +36,9 @@ public class MotorTest extends LinearOpMode {
                 motor.setVelocity(4000);
             }
 
-            //motor.setPower(0.4*gamepad1.left_stick_y)
             telemetry.addData("Velocity: ", motor.getVelocity());
             telemetry.addData("Ticks: ", motor.getCurrentPosition());
             telemetry.update();
-            //Code for controlling the motor
         }
 
     }
