@@ -6,13 +6,11 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 
@@ -26,36 +24,27 @@ public class TeleOpFinal extends LinearOpMode {
     DcMotorEx rightFront;
     DcMotorEx rightBack;
     DcMotorEx arm;
-    //Servo launcher;
+    CRServo hand;
 
     @Override
 
     public void runOpMode() {
         
-        //calculations for PIDF values from First Global Motor PIDF Tuning guide
-        
-        //Max V for old motors = 2680.0
-        //motor.setVelocityPIDFCoefficients(1.22, 0.122, 0, 12.2);
-        
+        //calculations for PIDF values from First Global Motor PIDF Tuning guide - values used for velocity control
+
+        // Initializing hardware
         leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
         leftBack = hardwareMap.get(DcMotorEx.class, "leftBack");
         rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
         rightBack = hardwareMap.get(DcMotorEx.class, "rightBack");
         arm = hardwareMap.get(DcMotorEx.class, "slide");
+        hand = hardwareMap.get(CRServo.class, "hand");
 
         
-        // PIDF coefficients are for sustaining a specific velocity
-        // leftFront.setVelocityPIDFCoefficients(1.057, 0.1057, 0, 10.57);
-        // leftBack.setVelocityPIDFCoefficients(1.057, 0.1057, 0, 10.57);
-        // rightFront.setVelocityPIDFCoefficients(1.057, 0.1057, 0, 10.57);
-        // rightBack.setVelocityPIDFCoefficients(1.057, 0.1057, 0, 10.57)
-        
-        //Max V for new motors = 3100.0
-        //newMotor.setVelocityPIDFCoefficients(1.057, 0.1057, 0, 10.57);
-        
-        //Need to reverse motors on one side
-        leftFront.setDirection(DcMotorEx.Direction.FORWARD); //reverse
-        rightFront.setDirection(DcMotorEx.Direction.FORWARD); //reverse
+        // All motors facing forward for the most recent build of the robot (go builda kit)
+        // Some chassis builds require reversal of two of the four motors
+        leftFront.setDirection(DcMotorEx.Direction.FORWARD);
+        rightFront.setDirection(DcMotorEx.Direction.FORWARD);
         leftBack.setDirection(DcMotorEx.Direction.FORWARD);
         rightBack.setDirection(DcMotorEx.Direction.FORWARD);
 
@@ -64,17 +53,25 @@ public class TeleOpFinal extends LinearOpMode {
 
         waitForStart();
 
+        /* Declaring variables
+        Percent is the percentage of power for driving
+        PastGP is a gamepad that is reset at every run of the while loop
+        */
         double percent = 15;
         Gamepad pastGP = null;
+
         while (opModeIsActive()) {
-            // Sets the past gamepad positioning to account for newly pressed buttons
+            // Sets the past gamepad positioning after each pass of while loop to account for newly pressed buttons
             pastGP.copy(gamepad1);
 
-            // Getting inputs
+            /*
+            Getting inputs for driving
+            If wheels are installed correctly (they make an x) and not upside down,
+            change the below lines to -, +, + instead of +, -, -
+             */
             double strafe = gamepad1.left_stick_x;
             double drive = -gamepad1.left_stick_y;
             double rotate = -gamepad1.right_stick_x;
-
 
             // Allows gamepad2 to take over driving
             if (gamepad2.left_bumper) {
@@ -101,6 +98,8 @@ public class TeleOpFinal extends LinearOpMode {
             telemetry.addData("Arm Velocity: ", arm.getVelocity());
             telemetry.addData("Arm Ext Position: ", arm.getCurrentPosition());
 
+            // This is wear the arm servo (hand) code will go
+
             // Adjusts percentage of wheel power
             if (percent < 100 && gamepad1.dpad_up && !pastGP.dpad_up) {
                 percent += 5;
@@ -126,10 +125,10 @@ public class TeleOpFinal extends LinearOpMode {
         } // While op mode is active
     } // Run Op Mode
     
-    //Functions
+    // Drive function
     //https://youtu.be/gnSW2QpkGXQ?si=S0n82yAB5Zl1MYK9 (shows a more complex method for programming mechanum wheels)
     public void drive(double drive, double strafe, double rotate, double percent) {
-        // The percent variable is used to decrease the power by that percent
+        // The percent variable is used to set the motor power to that percent
         // Algorithm adapted from ChatGPT
         double frontLeftPower = drive + strafe + rotate;
         double frontRightPower = -drive - strafe + rotate;
