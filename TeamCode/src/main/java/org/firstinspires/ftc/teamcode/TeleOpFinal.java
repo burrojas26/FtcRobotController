@@ -6,6 +6,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -62,7 +63,7 @@ public class TeleOpFinal extends LinearOpMode {
 
         waitForStart();
 
-        double percent = 65;
+        double percent = 15;
         while (opModeIsActive()) {
             // Getting inputs
             double strafe = gamepad1.left_stick_x;
@@ -94,6 +95,15 @@ public class TeleOpFinal extends LinearOpMode {
             // Telemetry data for arm
             telemetry.addData("Arm Velocity: ", arm.getVelocity());
             telemetry.addData("Arm Ext Position: ", arm.getCurrentPosition());
+
+            // Adjusts percentage of wheel power using my function in other class
+            MyFunctions funcs = new MyFunctions();
+            if (percent < 100 && funcs.justPressed(gamepad1, GamepadKeys.Button.DPAD_UP)) {
+                percent += 5;
+            }
+            if (percent > 0 && funcs.justPressed(gamepad1, GamepadKeys.Button.DPAD_DOWN)) {
+                percent -= 5;
+            }
 
             // Calls drive function
             drive(drive, strafe, rotate, percent);
