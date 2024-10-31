@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
 
 @TeleOp
@@ -64,7 +65,11 @@ public class TeleOpFinal extends LinearOpMode {
         waitForStart();
 
         double percent = 15;
+        Gamepad pastGP = null;
         while (opModeIsActive()) {
+            // Sets the past gamepad positioning to account for newly pressed buttons
+            pastGP.copy(gamepad1);
+
             // Getting inputs
             double strafe = gamepad1.left_stick_x;
             double drive = -gamepad1.left_stick_y;
@@ -96,12 +101,11 @@ public class TeleOpFinal extends LinearOpMode {
             telemetry.addData("Arm Velocity: ", arm.getVelocity());
             telemetry.addData("Arm Ext Position: ", arm.getCurrentPosition());
 
-            // Adjusts percentage of wheel power using my function in other class
-            MyFunctions funcs = new MyFunctions();
-            if (percent < 100 && funcs.justPressed(gamepad1, GamepadKeys.Button.DPAD_UP)) {
+            // Adjusts percentage of wheel power
+            if (percent < 100 && gamepad1.dpad_up && !pastGP.dpad_up) {
                 percent += 5;
             }
-            if (percent > 0 && funcs.justPressed(gamepad1, GamepadKeys.Button.DPAD_DOWN)) {
+            if (percent > 0 && gamepad1.dpad_down && !pastGP.dpad_down) {
                 percent -= 5;
             }
 
