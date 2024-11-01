@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 
@@ -24,7 +24,7 @@ public class TeleOpFinal extends LinearOpMode {
     DcMotorEx rightFront;
     DcMotorEx rightBack;
     DcMotorEx arm;
-    CRServo hand;
+    Servo hand;
 
     @Override
 
@@ -38,7 +38,7 @@ public class TeleOpFinal extends LinearOpMode {
         rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
         rightBack = hardwareMap.get(DcMotorEx.class, "rightBack");
         arm = hardwareMap.get(DcMotorEx.class, "slide");
-        hand = hardwareMap.get(CRServo.class, "hand");
+        hand = hardwareMap.get(Servo.class, "hand");
 
         
         // All motors facing forward for the most recent build of the robot (go builda kit)
@@ -59,6 +59,7 @@ public class TeleOpFinal extends LinearOpMode {
         */
         double percent = 15;
         Gamepad pastGP = null;
+        hand.setDirection(Servo.Direction.FORWARD);
 
         while (opModeIsActive()) {
             // Sets the past gamepad positioning after each pass of while loop to account for newly pressed buttons
@@ -99,6 +100,18 @@ public class TeleOpFinal extends LinearOpMode {
             telemetry.addData("Arm Ext Position: ", arm.getCurrentPosition());
 
             // This is wear the arm servo (hand) code will go
+            if (gamepad2.dpad_down) {
+                hand.setPosition(0.85);
+            }
+            if(gamepad2.dpad_right) {
+                hand.setPosition(0.7);
+            }
+            if(gamepad2.dpad_left) {
+                hand.setPosition(0);
+            }
+            // Telemetry data for and
+            telemetry.addData("Position: ", hand.getController().getServoPosition(0));
+            telemetry.update();
 
             // Adjusts percentage of wheel power
             if (percent < 100 && gamepad1.dpad_up && !pastGP.dpad_up) {
