@@ -58,7 +58,7 @@ public class TeleOpFinal extends LinearOpMode {
         PastGP is a gamepad that is reset at every run of the while loop
         */
         double percent = 15;
-        Gamepad pastGP = null;
+        Gamepad pastGP = gamepad1;
         hand.setDirection(Servo.Direction.FORWARD);
 
         while (opModeIsActive()) {
