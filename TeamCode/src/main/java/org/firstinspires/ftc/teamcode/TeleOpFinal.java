@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 
@@ -25,6 +26,7 @@ public class TeleOpFinal extends LinearOpMode {
     DcMotorEx rightBack;
     DcMotorEx arm;
     Servo hand;
+    CRServo intake;
 
     @Override
 
@@ -39,6 +41,7 @@ public class TeleOpFinal extends LinearOpMode {
         rightBack = hardwareMap.get(DcMotorEx.class, "rightBack");
         arm = hardwareMap.get(DcMotorEx.class, "slide");
         hand = hardwareMap.get(Servo.class, "hand");
+        intake = hardwareMap.get(CRServo.class, "intake");
 
         
         // All motors facing forward for the most recent build of the robot (go builda kit)
@@ -78,6 +81,16 @@ public class TeleOpFinal extends LinearOpMode {
                 drive = -gamepad2.left_stick_y;
                 rotate = -gamepad2.right_stick_x;
             }
+
+            //Active intake servo code
+            if (gamepad1.b) {
+                intake.setPower(1);
+            }
+            if (gamepad1.x) {
+                intake.setPower(-1);
+            }
+            //Adding telemetry data
+            telemetry.addData("intake position", intake.getController().getServoPosition(1));
 
             // Arm extension control
             if (gamepad2.x) {

@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.CRServo;
 
 @TeleOp
 
@@ -12,30 +12,28 @@ public class ServoTest extends LinearOpMode {
 
     //Variables
     //Linear slide motor may not be a DcMotorEx
-    Servo hand;
+    CRServo intake;
 
     @Override
 
     public void runOpMode() {
-        hand = hardwareMap.get(Servo.class, "hand");
+        intake = hardwareMap.get(CRServo.class, "intake");
 
         waitForStart();
-        hand.setPosition(0.7);
         while (opModeIsActive()) {
-
             if (gamepad1.b) {
-                hand.setPosition(0.85);
+                intake.setPower(1);
             }
-            if(gamepad1.y) {
-                hand.setDirection(Servo.Direction.FORWARD);
-                hand.setPosition(0.7);
+            if (gamepad1.x) {
+                intake.setPower(-1);
             }
-            if(gamepad1.a) {
-                hand.setDirection(Servo.Direction.FORWARD);
-                hand.setPosition(0);
+            if (gamepad1.a) {
+                intake.setPower(0);
             }
 
-            telemetry.addData("Position: ", hand.getController().getServoPosition(0));
+
+            telemetry.addData("power: ", intake.getPower());
+            telemetry.addData("position", intake.getController().getServoPosition(1));
             telemetry.update();
         }
 

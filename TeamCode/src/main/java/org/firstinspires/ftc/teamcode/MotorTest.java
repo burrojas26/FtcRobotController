@@ -17,7 +17,7 @@ public class MotorTest extends LinearOpMode {
     @Override
 
     public void runOpMode() {
-        motor = hardwareMap.get(DcMotorEx.class, "slide");
+        motor = hardwareMap.get(DcMotorEx.class, "intakePivot");
         motor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
 
         waitForStart();
@@ -26,7 +26,7 @@ public class MotorTest extends LinearOpMode {
                 motor.setVelocity(0);
             }
             if(gamepad1.y) {
-                motor.setTargetPosition(-2800);
+                motor.setTargetPosition(200);
                 motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 motor.setVelocity(4000);
             }
