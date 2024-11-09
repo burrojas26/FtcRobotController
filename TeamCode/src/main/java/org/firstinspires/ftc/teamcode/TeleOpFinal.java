@@ -43,8 +43,8 @@ public class TeleOpFinal extends LinearOpMode {
         
         // All motors facing forward for the most recent build of the robot (go builda kit)
         // Some chassis builds require reversal of two of the four motors
-        leftFront.setDirection(DcMotorEx.Direction.FORWARD);
-        rightFront.setDirection(DcMotorEx.Direction.FORWARD);
+        leftFront.setDirection(DcMotorEx.Direction.REVERSE);
+        rightFront.setDirection(DcMotorEx.Direction.REVERSE);
         leftBack.setDirection(DcMotorEx.Direction.FORWARD);
         rightBack.setDirection(DcMotorEx.Direction.FORWARD);
 
@@ -58,7 +58,8 @@ public class TeleOpFinal extends LinearOpMode {
         PastGP is a gamepad that is reset at every run of the while loop
         */
         double percent = 65;
-        Gamepad pastGP = gamepad1;
+        boolean dpadUp = false;
+        boolean dpadDown = false;
         hand.setDirection(Servo.Direction.FORWARD);
 
         while (opModeIsActive()) {
@@ -67,8 +68,8 @@ public class TeleOpFinal extends LinearOpMode {
             If wheels are installed correctly (they make an x) and not upside down,
             change the below lines to -, +, + instead of +, -, -
              */
-            double strafe = -gamepad1.left_stick_x;
-            double drive = gamepad1.left_stick_y;
+            double strafe = gamepad1.left_stick_x;
+            double drive = -gamepad1.left_stick_y;
             double rotate = gamepad1.right_stick_x;
 
             // Allows gamepad2 to take over driving
@@ -110,15 +111,16 @@ public class TeleOpFinal extends LinearOpMode {
             telemetry.addData("Position: ", hand.getController().getServoPosition(0));
 
             // Adjusts percentage of wheel power
-            if (percent < 100 && gamepad1.dpad_up && !pastGP.dpad_up) {
+            if (percent < 100 && gamepad1.dpad_up && !dpadUp) {
                 percent += 5;
             }
-            if (percent > 0 && gamepad1.dpad_down && !pastGP.dpad_down) {
+            if (percent > 0 && gamepad1.dpad_down && !dpadDown) {
                 percent -= 5;
             }
 
             // Sets the past gamepad positioning after each pass of while loop to account for newly pressed buttons
-            pastGP.copy(gamepad1);
+            dpadUp = gamepad1.dpad_up;
+            dpadDown = gamepad1.dpad_down;
 
             // Calls drive function
             drive(drive, strafe, rotate, percent);
@@ -143,8 +145,8 @@ public class TeleOpFinal extends LinearOpMode {
         // The percent variable is used to set the motor power to that percent
         // Algorithm adapted from ChatGPT
         double frontLeftPower = drive + strafe + rotate;
-        double frontRightPower = drive - strafe - rotate;
-        double backLeftPower = drive - strafe + rotate;
+        double frontRightPower = -drive + strafe + rotate;
+        double backLeftPower = -drive + strafe - rotate;
         double backRightPower = drive + strafe - rotate;
 
         // Normalize the values so no value exceeds 1.0
@@ -172,6 +174,5 @@ public class TeleOpFinal extends LinearOpMode {
         rightFront.setPower(frontRightPower);
         leftBack.setPower(backLeftPower);
         rightBack.setPower(backRightPower);
-        telemetry.update();
     }
 }
