@@ -27,11 +27,12 @@ public class TeleOpFinal extends LinearOpMode {
     DcMotorEx arm;
     Servo hand;
     CRServo intake;
+    DcMotorEx intakeRotate;
 
     @Override
 
     public void runOpMode() {
-        
+
         //calculations for PIDF values from First Global Motor PIDF Tuning guide - values used for velocity control
 
         // Initializing hardware
@@ -42,8 +43,9 @@ public class TeleOpFinal extends LinearOpMode {
         arm = hardwareMap.get(DcMotorEx.class, "slide");
         hand = hardwareMap.get(Servo.class, "hand");
         intake = hardwareMap.get(CRServo.class, "intake");
+        intakeRotate = hardwareMap.get(DcMotorEx.class, "intakeRotate");
 
-        
+
         // All motors facing forward for the most recent build of the robot (go builda kit)
         // Some chassis builds require reversal of two of the four motors
         leftFront.setDirection(DcMotorEx.Direction.REVERSE);
@@ -89,6 +91,11 @@ public class TeleOpFinal extends LinearOpMode {
             if (gamepad1.x) {
                 intake.setPower(-1);
             }
+
+            // Intake Motor code
+            intakeRotate.setPower(0.5*gamepad2.left_stick_x);
+            telemetry.addData("Intake Position", intakeRotate.getCurrentPosition());
+
             //Adding telemetry data
             telemetry.addData("intake position", intake.getController().getServoPosition(1));
 
@@ -137,7 +144,7 @@ public class TeleOpFinal extends LinearOpMode {
 
             // Calls drive function
             drive(drive, strafe, rotate, percent);
-            
+
             // adding telemetry data
             telemetry.addData("Drive", drive);
             telemetry.addData("Strafe", strafe);
@@ -151,7 +158,7 @@ public class TeleOpFinal extends LinearOpMode {
             telemetry.update();
         } // While op mode is active
     } // Run Op Mode
-    
+
     // Drive function
     //https://youtu.be/gnSW2QpkGXQ?si=S0n82yAB5Zl1MYK9 (shows a more complex method for programming mechanum wheels)
     public void drive(double drive, double strafe, double rotate, double percent) {
@@ -181,7 +188,7 @@ public class TeleOpFinal extends LinearOpMode {
             backLeftPower *= percent/100;
             backRightPower *= percent/100;
         }
-        
+
         // Output the safe vales to the motor drives.
         leftFront.setPower(frontLeftPower);
         rightFront.setPower(frontRightPower);
