@@ -26,8 +26,8 @@ public class TeleOpFinal extends LinearOpMode {
     DcMotorEx rightBack;
     DcMotorEx arm;
     Servo hand;
-    CRServo intake;
-    DcMotorEx intakeRotate;
+    //CRServo intake;
+    //DcMotorEx intakeRotate;
 
     @Override
 
@@ -42,8 +42,8 @@ public class TeleOpFinal extends LinearOpMode {
         rightBack = hardwareMap.get(DcMotorEx.class, "rightBack");
         arm = hardwareMap.get(DcMotorEx.class, "slide");
         hand = hardwareMap.get(Servo.class, "hand");
-        intake = hardwareMap.get(CRServo.class, "intake");
-        intakeRotate = hardwareMap.get(DcMotorEx.class, "intakeRotate");
+        //intake = hardwareMap.get(CRServo.class, "intake");
+        //intakeRotate = hardwareMap.get(DcMotorEx.class, "intakeRotate");
 
 
         // All motors facing forward for the most recent build of the robot (go builda kit)
@@ -85,33 +85,33 @@ public class TeleOpFinal extends LinearOpMode {
             }
 
             //Active intake servo code
-            if (gamepad1.b) {
-                intake.setPower(1);
-            }
-            if (gamepad1.x) {
-                intake.setPower(-1);
-            }
-
-            // Intake Motor code
-            intakeRotate.setPower(0.5*gamepad2.left_stick_x);
-            telemetry.addData("Intake Position", intakeRotate.getCurrentPosition());
-
-            //Adding telemetry data
-            telemetry.addData("intake position", intake.getController().getServoPosition(1));
+//            if (gamepad1.b) {
+//                intake.setPower(1);
+//            }
+//            if (gamepad1.x) {
+//                intake.setPower(-1);
+//            }
+//
+//            // Intake Motor code
+//            intakeRotate.setPower(0.5*gamepad2.left_stick_x);
+//            telemetry.addData("Intake Position", intakeRotate.getCurrentPosition());
+//
+//            //Adding telemetry data
+//            telemetry.addData("intake position", intake.getController().getServoPosition(1));
 
             // Arm extension control
             if (gamepad2.x) {
                 arm.setVelocity(0);
             }
             if(gamepad2.y) {
-                arm.setTargetPosition(-2800);
+                arm.setTargetPosition(-2500);
                 arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                arm.setVelocity(4000);
+                arm.setVelocity(3000);
             }
             if(gamepad2.a) {
                 arm.setTargetPosition(0);
                 arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                arm.setVelocity(4000);
+                arm.setVelocity(3000);
             }
             // Telemetry data for arm
             telemetry.addData("Arm Velocity: ", arm.getVelocity());
@@ -119,13 +119,13 @@ public class TeleOpFinal extends LinearOpMode {
 
             // This is wear the arm servo (hand) code will go
             if (gamepad2.dpad_down) {
-                hand.setPosition(0.85);
+                hand.setPosition(1);
             }
             if(gamepad2.dpad_right) {
-                hand.setPosition(0.7);
+                hand.setPosition(0.85);
             }
             if(gamepad2.dpad_left) {
-                hand.setPosition(0);
+                hand.setPosition(0.1);
             }
             // Telemetry data for and
             telemetry.addData("Position: ", hand.getController().getServoPosition(0));
