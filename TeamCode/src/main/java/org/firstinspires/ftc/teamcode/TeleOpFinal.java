@@ -103,11 +103,11 @@ public class TeleOpFinal extends LinearOpMode {
             if (gamepad2.x) {
                 arm.setVelocity(0);
             }
-            if (gamepad1.ps) {
+            if (gamepad2.ps) {
                 arm.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
             }
             if(gamepad2.y) {
-                arm.setTargetPosition(-2800);
+                arm.setTargetPosition(-2750);
                 arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 arm.setVelocity(4000);
             }
