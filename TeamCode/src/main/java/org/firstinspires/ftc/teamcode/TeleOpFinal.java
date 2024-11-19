@@ -6,11 +6,15 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
@@ -20,6 +24,8 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 public class TeleOpFinal extends LinearOpMode {
 
     //Variables
+    BNO055IMU imu;
+    Orientation angles;
     DcMotorEx leftFront;
     DcMotorEx leftBack;
     DcMotorEx rightFront;
@@ -35,6 +41,14 @@ public class TeleOpFinal extends LinearOpMode {
 
         //calculations for PIDF values from First Global Motor PIDF Tuning guide - values used for velocity control
 
+        // Initialize the IMU
+        // IMU code adapted from chat gpt
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.mode = BNO055IMU.SensorMode.IMU;
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
+
         // Initializing hardware
         leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
         leftBack = hardwareMap.get(DcMotorEx.class, "leftBack");
@@ -44,7 +58,6 @@ public class TeleOpFinal extends LinearOpMode {
         hand = hardwareMap.get(Servo.class, "hand");
         //intake = hardwareMap.get(CRServo.class, "intake");
         //intakeRotate = hardwareMap.get(DcMotorEx.class, "intakeRotate");
-
 
         // All motors facing forward for the most recent build of the robot (go builda kit)
         // Some chassis builds require reversal of two of the four motors
@@ -56,6 +69,16 @@ public class TeleOpFinal extends LinearOpMode {
         // Setting the position of the arm to 0 at initialization
         arm.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
 
+        // Wait for calibration of imu
+        while (!isStopRequested() && !imu.isGyroCalibrated()) {
+            telemetry.addData("Status", "Calibrating IMU...");
+            telemetry.update();
+            sleep(50);
+        }
+
+        telemetry.addData("Status", "Ready");
+        telemetry.update();
+
         waitForStart();
 
         /* Declaring variables
@@ -65,23 +88,36 @@ public class TeleOpFinal extends LinearOpMode {
         double percent = 65;
         boolean dpadUp = false;
         boolean dpadDown = false;
+        boolean fieldCentric = false;
         hand.setDirection(Servo.Direction.FORWARD);
 
         while (opModeIsActive()) {
-            /*
-            Getting inputs for driving
-            If wheels are installed correctly (they make an x) and not upside down,
-            change the below lines to -, +, + instead of +, -, -
-             */
+
+            // Getting inputs for driving
             double strafe = gamepad1.left_stick_x;
             double drive = -gamepad1.left_stick_y;
             double rotate = gamepad1.right_stick_x;
+
+            // Get the robot's current heading in radians
+            angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, BNO055IMU.AngleUnit.DEGREES.toAngleUnit());
+            double robotHeading = Math.toRadians(angles.firstAngle);
+            telemetry.addData("Robot Position", angles.firstAngle);
+
+            // Field-centric transformation using Rotation Matrix
+            double newX = strafe * Math.cos(robotHeading) - drive * Math.sin(robotHeading);
+            double newY = strafe * Math.sin(robotHeading) + drive * Math.cos(robotHeading);
+
 
             // Allows gamepad2 to take over driving
             if (gamepad2.left_bumper) {
                 strafe = gamepad2.left_stick_x;
                 drive = -gamepad2.left_stick_y;
                 rotate = -gamepad2.right_stick_x;
+            }
+
+            // Toggles between field centric and robot centric
+            if (gamepad1.ps) {
+                fieldCentric = !fieldCentric;
             }
 
             //Active intake servo code
@@ -145,8 +181,18 @@ public class TeleOpFinal extends LinearOpMode {
             dpadUp = gamepad1.dpad_up;
             dpadDown = gamepad1.dpad_down;
 
-            // Calls drive function
-            drive(drive, strafe, rotate, percent);
+            // Calls drive function and changes inputs whether the robot is in field or robot centric mode
+            double x;
+            double y;
+            if (fieldCentric) {
+                x = newX;
+                y = newY;
+            }
+            else {
+                x = strafe;
+                y = drive;
+            }
+            drive(x, y, rotate, percent);
 
             // adding telemetry data
             telemetry.addData("Drive", drive);
@@ -163,7 +209,7 @@ public class TeleOpFinal extends LinearOpMode {
     } // Run Op Mode
 
     // Drive function
-    //https://youtu.be/gnSW2QpkGXQ?si=S0n82yAB5Zl1MYK9 (shows a more complex method for programming mechanum wheels)
+    // https://youtu.be/gnSW2QpkGXQ?si=S0n82yAB5Zl1MYK9 (shows a more complex method for programming mechanum wheels)
     public void drive(double drive, double strafe, double rotate, double percent) {
         // The percent variable is used to set the motor power to that percent
         // Algorithm adapted from ChatGPT

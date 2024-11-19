@@ -57,13 +57,6 @@ public class updatedDriveTest extends LinearOpMode {
             double theta = Math.atan2(y, x);
             double power = Math.hypot(x, y);
 
-            if (gamepad1.dpad_up) {
-                percent+=10;
-            }
-
-            if (gamepad1.dpad_down) {
-                percent-=10;
-            }
 
             drive(theta, power, turn, percent);
 
