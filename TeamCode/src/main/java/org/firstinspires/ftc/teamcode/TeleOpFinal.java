@@ -193,12 +193,12 @@ public class TeleOpFinal extends LinearOpMode {
             double x;
             double y;
             if (fieldCentric) {
-                x = newX;
-                y = newY;
+                y = newX;
+                x = newY;
             }
             else {
-                x = strafe;
-                y = drive;
+                y = strafe;
+                x = drive;
             }
             drive(x, y, rotate, percent);
 
