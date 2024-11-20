@@ -5,16 +5,19 @@
 
 
 package org.firstinspires.ftc.teamcode;
-
-import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
@@ -23,8 +26,10 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 
 public class TeleOpFinal extends LinearOpMode {
 
+
+
     //Variables
-    BNO055IMU imu;
+    IMU imu;
     Orientation angles;
     DcMotorEx leftFront;
     DcMotorEx leftBack;
@@ -41,15 +46,11 @@ public class TeleOpFinal extends LinearOpMode {
 
         //calculations for PIDF values from First Global Motor PIDF Tuning guide - values used for velocity control
 
-        // Initialize the IMU
-        // IMU code adapted from chat gpt
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.mode = BNO055IMU.SensorMode.IMU;
-        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        imu.initialize(parameters);
+
 
         // Initializing hardware
+        // Get the IMU instance
+        imu = hardwareMap.get(IMU.class, "imu");
         leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
         leftBack = hardwareMap.get(DcMotorEx.class, "leftBack");
         rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
@@ -58,6 +59,13 @@ public class TeleOpFinal extends LinearOpMode {
         hand = hardwareMap.get(Servo.class, "hand");
         //intake = hardwareMap.get(CRServo.class, "intake");
         //intakeRotate = hardwareMap.get(DcMotorEx.class, "intakeRotate");
+
+        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.RIGHT;
+        RevHubOrientationOnRobot.UsbFacingDirection  usbDirection  = RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD;
+
+        RevHubOrientationOnRobot orientation = new RevHubOrientationOnRobot(logoDirection, usbDirection);
+
+        imu.initialize(new IMU.Parameters(orientation));
 
         // All motors facing forward for the most recent build of the robot (go builda kit)
         // Some chassis builds require reversal of two of the four motors
@@ -69,15 +77,6 @@ public class TeleOpFinal extends LinearOpMode {
         // Setting the position of the arm to 0 at initialization
         arm.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
 
-        // Wait for calibration of imu
-        while (!isStopRequested() && !imu.isGyroCalibrated()) {
-            telemetry.addData("Status", "Calibrating IMU...");
-            telemetry.update();
-            sleep(50);
-        }
-
-        telemetry.addData("Status", "Ready");
-        telemetry.update();
 
         waitForStart();
 
@@ -102,7 +101,8 @@ public class TeleOpFinal extends LinearOpMode {
             telemetry.addData("Field Centric Mode", fieldCentric);
 
             // Get the robot's current heading in radians
-            angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, BNO055IMU.AngleUnit.DEGREES.toAngleUnit());
+            // Retrieve the robot's orientation
+            Orientation angles = imu.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
             double robotHeading = Math.toRadians(angles.firstAngle);
             telemetry.addData("Robot Position", angles.firstAngle);
 
