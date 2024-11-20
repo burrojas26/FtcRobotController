@@ -12,14 +12,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
-
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.Gamepad;
 
 
 @TeleOp
@@ -37,17 +34,12 @@ public class TeleOpFinal extends LinearOpMode {
     DcMotorEx rightBack;
     DcMotorEx arm;
     Servo hand;
-    //CRServo intake;
-    //DcMotorEx intakeRotate;
+    // CRServo intake;
+    // DcMotorEx intakeRotate;
 
     @Override
 
     public void runOpMode() {
-
-        //calculations for PIDF values from First Global Motor PIDF Tuning guide - values used for velocity control
-
-
-
         // Initializing hardware
         // Get the IMU instance
         imu = hardwareMap.get(IMU.class, "imu");
@@ -57,17 +49,18 @@ public class TeleOpFinal extends LinearOpMode {
         rightBack = hardwareMap.get(DcMotorEx.class, "rightBack");
         arm = hardwareMap.get(DcMotorEx.class, "slide");
         hand = hardwareMap.get(Servo.class, "hand");
-        //intake = hardwareMap.get(CRServo.class, "intake");
-        //intakeRotate = hardwareMap.get(DcMotorEx.class, "intakeRotate");
+        // intake = hardwareMap.get(CRServo.class, "intake");
+        // intakeRotate = hardwareMap.get(DcMotorEx.class, "intakeRotate");
 
+        // Setting the parameters for the orientation of the control hub
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.RIGHT;
         RevHubOrientationOnRobot.UsbFacingDirection  usbDirection  = RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD;
-
         RevHubOrientationOnRobot orientation = new RevHubOrientationOnRobot(logoDirection, usbDirection);
 
+        // Initializing the imu
         imu.initialize(new IMU.Parameters(orientation));
 
-        // All motors facing forward for the most recent build of the robot (go builda kit)
+        // For most recent robot design the front motors are REVERSED and the back are FORWARD
         // Some chassis builds require reversal of two of the four motors
         leftFront.setDirection(DcMotorEx.Direction.REVERSE);
         rightFront.setDirection(DcMotorEx.Direction.REVERSE);
@@ -77,16 +70,17 @@ public class TeleOpFinal extends LinearOpMode {
         // Setting the position of the arm to 0 at initialization
         arm.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
 
-
         waitForStart();
 
         /* Declaring variables
         Percent is the percentage of power for driving
-        PastGP is a gamepad that is reset at every run of the while loop
+        dpadUp, dpadDown, and ps button are variables used to determine if the buttons were just pressed
+        fieldCentric is used to determine whether the robot is in field centric or robot centric mode
         */
         double percent = 65;
         boolean dpadUp = false;
         boolean dpadDown = false;
+        boolean psButton = false;
         boolean fieldCentric = false;
         hand.setDirection(Servo.Direction.FORWARD);
 
@@ -110,7 +104,6 @@ public class TeleOpFinal extends LinearOpMode {
             double newX = strafe * Math.cos(robotHeading) - drive * Math.sin(robotHeading);
             double newY = strafe * Math.sin(robotHeading) + drive * Math.cos(robotHeading);
 
-
             // Allows gamepad2 to take over driving
             if (gamepad2.left_bumper) {
                 strafe = gamepad2.left_stick_x;
@@ -119,9 +112,10 @@ public class TeleOpFinal extends LinearOpMode {
             }
 
             // Toggles between field centric and robot centric
-            if (gamepad1.ps) {
+            if (gamepad1.ps && !psButton) {
                 fieldCentric = !fieldCentric;
             }
+            psButton = gamepad1.ps;
 
             //Active intake servo code
 //            if (gamepad1.b) {
@@ -217,7 +211,6 @@ public class TeleOpFinal extends LinearOpMode {
     } // Run Op Mode
 
     // Drive function
-    // https://youtu.be/gnSW2QpkGXQ?si=S0n82yAB5Zl1MYK9 (shows a more complex method for programming mechanum wheels)
     public void drive(double drive, double strafe, double rotate, double percent) {
         // The percent variable is used to set the motor power to that percent
         // Algorithm adapted from ChatGPT
