@@ -193,8 +193,8 @@ public class TeleOpFinal extends LinearOpMode {
             double x;
             double y;
             if (fieldCentric) {
-                y = newX;
-                x = newY;
+                x = newX;
+                y = newY;
             }
             else {
                 y = strafe;
