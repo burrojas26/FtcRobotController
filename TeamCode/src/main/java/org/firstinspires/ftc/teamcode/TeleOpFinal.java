@@ -98,6 +98,9 @@ public class TeleOpFinal extends LinearOpMode {
             double drive = -gamepad1.left_stick_y;
             double rotate = gamepad1.right_stick_x;
 
+            // Displays the current drive mode
+            telemetry.addData("Field Centric Mode", fieldCentric);
+
             // Get the robot's current heading in radians
             angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, BNO055IMU.AngleUnit.DEGREES.toAngleUnit());
             double robotHeading = Math.toRadians(angles.firstAngle);
