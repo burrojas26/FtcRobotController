@@ -6,6 +6,7 @@
 
 package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -37,7 +38,9 @@ public class TeleOpFinal extends LinearOpMode {
     DcMotorEx rightBack;
     DcMotorEx arm;
     Servo hand;
-    //CRServo intake;
+    CRServo intakeLeft;
+    CRServo intakeRight;
+    DcMotorEx intakeMotor;
     //DcMotorEx intakeRotate;
 
     @Override
@@ -57,7 +60,9 @@ public class TeleOpFinal extends LinearOpMode {
         rightBack = hardwareMap.get(DcMotorEx.class, "rightBack");
         arm = hardwareMap.get(DcMotorEx.class, "slide");
         hand = hardwareMap.get(Servo.class, "hand");
-        //intake = hardwareMap.get(CRServo.class, "intake");
+        intakeLeft = hardwareMap.get(CRServo.class, "intakeLeft");
+        intakeRight = hardwareMap.get(CRServo.class, "intakeRight");
+        intakeMotor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
         //intakeRotate = hardwareMap.get(DcMotorEx.class, "intakeRotate");
 
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.RIGHT;
@@ -77,6 +82,9 @@ public class TeleOpFinal extends LinearOpMode {
         // Setting the position of the arm to 0 at initialization
         arm.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
 
+        // Setting the position of the intakeArm to 0 at initialization
+        intakeMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+
 
         waitForStart();
 
@@ -88,10 +96,12 @@ public class TeleOpFinal extends LinearOpMode {
         boolean dpadUp = false;
         boolean dpadDown = false;
         boolean fieldCentric = false;
-        hand.setDirection(Servo.Direction.FORWARD);
+        boolean bBtn = false;
+        boolean verticle = true;
+        intakeRight.getController().setServoPosition(intakeRight.getPortNumber(), 0);
+        intakeLeft.getController().setServoPosition(intakeLeft.getPortNumber(), 1);
 
         while (opModeIsActive()) {
-
             // Getting inputs for driving
             double strafe = gamepad1.left_stick_x;
             double drive = -gamepad1.left_stick_y;
@@ -122,40 +132,55 @@ public class TeleOpFinal extends LinearOpMode {
             if (gamepad1.ps) {
                 fieldCentric = !fieldCentric;
             }
-
+            // Switch the mode to horizontal arm
+            if (gamepad2.b && !bBtn) {
+                verticle = !verticle;
+            }
+            // Adding the mode to telemetry
+            telemetry.addData("Verticle Mode", verticle);
+            bBtn = gamepad2.b;
             //Active intake servo code
-//            if (gamepad1.b) {
-//                intake.setPower(1);
-//            }
-//            if (gamepad1.x) {
-//                intake.setPower(-1);
-//            }
-//
-//            // Intake Motor code
-//            intakeRotate.setPower(0.5*gamepad2.left_stick_x);
-//            telemetry.addData("Intake Position", intakeRotate.getCurrentPosition());
-//
-//            //Adding telemetry data
-//            telemetry.addData("intake position", intake.getController().getServoPosition(1));
+            // Pick the tile up
+            if (gamepad2.y && !verticle) {
+                intakeRight.getController().setServoPosition(intakeRight.getPortNumber(), 1);
+                intakeLeft.getController().setServoPosition(intakeLeft.getPortNumber(), 0);
+                if(intakeRight.getController().getServoPosition(intakeRight.getPortNumber()) == 1) {
+                    intakeMotor.setTargetPosition(-100);
+                    intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    intakeMotor.setVelocity(150);
+                }
+            }
+            if (gamepad2.a && !verticle) {
+                intakeRight.getController().setServoPosition(intakeRight.getPortNumber(), 0);
+                intakeLeft.getController().setServoPosition(intakeLeft.getPortNumber(), 1);
+            }
+            if (gamepad2.x && !verticle) {
+                intakeMotor.setTargetPosition(0);
+                intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                intakeMotor.setVelocity(100);
+            }
+            telemetry.addData("Intake Right Position", intakeRight.getController().getServoPosition(intakeRight.getPortNumber()));
+            telemetry.addData("Intake Left Position", intakeLeft.getController().getServoPosition(intakeLeft.getPortNumber()));
+            telemetry.addData("Intake Motor Position", intakeMotor.getCurrentPosition());
 
             // Arm extension control
-            if (gamepad2.x) {
+            if (gamepad2.x && verticle) {
                 arm.setVelocity(0);
             }
-            if (gamepad2.right_bumper) {
+            if (gamepad2.right_bumper && verticle) {
                 arm.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
             }
-            if(gamepad2.y) {
+            if(gamepad2.y && verticle) {
                 arm.setTargetPosition(-2750);
                 arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 arm.setVelocity(4000);
             }
-            if(gamepad2.a) {
+            if(gamepad2.a && verticle) {
                 arm.setTargetPosition(0);
                 arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 arm.setVelocity(4000);
             }
-            if (gamepad2.ps) {
+            if (gamepad2.ps && verticle) {
                 arm.setTargetPosition(-1900);
                 arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 arm.setVelocity(4000);
@@ -165,13 +190,13 @@ public class TeleOpFinal extends LinearOpMode {
             telemetry.addData("Arm Ext Position: ", arm.getCurrentPosition());
 
             // This is wear the arm servo (hand) code will go
-            if (gamepad2.dpad_down) {
+            if (gamepad2.dpad_down && verticle) {
                 hand.setPosition(1);
             }
-            if(gamepad2.dpad_right) {
+            if(gamepad2.dpad_right && verticle) {
                 hand.setPosition(0.85);
             }
-            if(gamepad2.dpad_left) {
+            if(gamepad2.dpad_left && verticle) {
                 hand.setPosition(0.1);
             }
             // Telemetry data for and
