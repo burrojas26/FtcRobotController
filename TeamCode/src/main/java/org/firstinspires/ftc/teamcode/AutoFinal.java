@@ -1,13 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.Gamepad;
 
 @Autonomous
 public class AutoFinal extends LinearOpMode {
@@ -31,8 +28,8 @@ public class AutoFinal extends LinearOpMode {
         rightBack = hardwareMap.get(DcMotorEx.class, "rightBack");
         arm = hardwareMap.get(DcMotorEx.class, "slide");
         hand = hardwareMap.get(Servo.class, "hand");
-        intake = hardwareMap.get(CRServo.class, "intake");
-        intakeRotate = hardwareMap.get(DcMotorEx.class, "intakeRotate");
+        // intake = hardwareMap.get(CRServo.class, "intake");
+        // intakeRotate = hardwareMap.get(DcMotorEx.class, "intakeRotate");
 
         // All motors facing forward for the most recent build of the robot (go builda kit)
         // Some chassis builds require reversal of two of the four motors
