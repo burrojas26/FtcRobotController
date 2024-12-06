@@ -41,6 +41,7 @@ public class TeleOpFinal extends LinearOpMode {
     CRServo intakeLeft;
     CRServo intakeRight;
     DcMotorEx intakeMotor;
+    DcMotorEx hSlide;
     //DcMotorEx intakeRotate;
 
     @Override
@@ -63,7 +64,7 @@ public class TeleOpFinal extends LinearOpMode {
         intakeLeft = hardwareMap.get(CRServo.class, "intakeLeft");
         intakeRight = hardwareMap.get(CRServo.class, "intakeRight");
         intakeMotor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
-        //intakeRotate = hardwareMap.get(DcMotorEx.class, "intakeRotate");
+        hSlide = hardwareMap.get(DcMotorEx.class, "hSlide");
 
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.RIGHT;
         RevHubOrientationOnRobot.UsbFacingDirection  usbDirection  = RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD;
@@ -97,7 +98,7 @@ public class TeleOpFinal extends LinearOpMode {
         boolean dpadDown = false;
         boolean fieldCentric = false;
         boolean bBtn = false;
-        boolean verticle = true;
+        boolean vertical = true;
         intakeRight.getController().setServoPosition(intakeRight.getPortNumber(), 0);
         intakeLeft.getController().setServoPosition(intakeLeft.getPortNumber(), 1);
 
@@ -107,14 +108,11 @@ public class TeleOpFinal extends LinearOpMode {
             double drive = -gamepad1.left_stick_y;
             double rotate = gamepad1.right_stick_x;
 
-            // Displays the current drive mode
-            telemetry.addData("Field Centric Mode", fieldCentric);
 
             // Get the robot's current heading in radians
             // Retrieve the robot's orientation
             Orientation angles = imu.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
             double robotHeading = Math.toRadians(angles.firstAngle);
-            telemetry.addData("Robot Position", angles.firstAngle);
 
             // Field-centric transformation using Rotation Matrix
             double newX = strafe * Math.cos(robotHeading) - drive * Math.sin(robotHeading);
@@ -134,73 +132,100 @@ public class TeleOpFinal extends LinearOpMode {
             }
             // Switch the mode to horizontal arm
             if (gamepad2.b && !bBtn) {
-                verticle = !verticle;
+                vertical = !vertical;
             }
-            // Adding the mode to telemetry
-            telemetry.addData("Verticle Mode", verticle);
             bBtn = gamepad2.b;
-            //Active intake servo code
+
+            //Active intake servo and pivot code
             // Pick the tile up
-            if (gamepad2.y && !verticle) {
+            if (gamepad2.dpad_up && !vertical) {
                 intakeRight.getController().setServoPosition(intakeRight.getPortNumber(), 1);
                 intakeLeft.getController().setServoPosition(intakeLeft.getPortNumber(), 0);
-                if(intakeRight.getController().getServoPosition(intakeRight.getPortNumber()) == 1) {
-                    intakeMotor.setTargetPosition(-100);
-                    intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    intakeMotor.setVelocity(150);
-                }
+                // Waits until the servos complete 5 cycles
+                while (intakeRight.getPower() != 0) {}
+                intakeMotor.setTargetPosition(-100);
+                intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                intakeMotor.setVelocity(150);
             }
-            if (gamepad2.a && !verticle) {
+            // Reset intake
+            if (gamepad2.dpad_down && !vertical) {
                 intakeRight.getController().setServoPosition(intakeRight.getPortNumber(), 0);
                 intakeLeft.getController().setServoPosition(intakeLeft.getPortNumber(), 1);
-            }
-            if (gamepad2.x && !verticle) {
                 intakeMotor.setTargetPosition(0);
                 intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 intakeMotor.setVelocity(100);
             }
-            telemetry.addData("Intake Right Position", intakeRight.getController().getServoPosition(intakeRight.getPortNumber()));
-            telemetry.addData("Intake Left Position", intakeLeft.getController().getServoPosition(intakeLeft.getPortNumber()));
-            telemetry.addData("Intake Motor Position", intakeMotor.getCurrentPosition());
+            // Control horizontal arm pivot
+            if (!gamepad2.left_bumper && !vertical) {
+                float increase = gamepad2.left_stick_y*20;
+                intakeMotor.setTargetPosition((int)(intakeMotor.getCurrentPosition()+increase));
+                intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                intakeMotor.setVelocity(100);
+            }
+            // Reset encoder for horizontal arm pivot
+            if (gamepad2.dpad_left && !vertical) {
+                intakeMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+            }
+
+            // Active intake extension code
+            // Pre-programmed instructions and manual control
+            if (gamepad2.x && !vertical) {
+                hSlide.setVelocity(0);
+            }
+            if (gamepad2.right_bumper && !vertical) {
+                hSlide.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+            }
+            if(gamepad2.y && !vertical) {
+                hSlide.setTargetPosition(100); // CHANGE THIS VALUE
+                hSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                hSlide.setVelocity(400); // CHANGE THIS VALUE
+            }
+            if(gamepad2.a && !vertical) {
+                hSlide.setTargetPosition(0);
+                hSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                hSlide.setVelocity(400); // CHANGE THIS VALUE
+            }
+            // Allows the horizontal slide to be controlled by the right joystick
+            if (!gamepad2.left_bumper && !vertical) {
+                float increase = gamepad2.right_stick_y*20; // Add a - sign depending on how the motor is orientated
+                hSlide.setTargetPosition((int)(hSlide.getCurrentPosition()+increase));
+                hSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                hSlide.setVelocity(250); // CHANGE THIS VALUE
+            }
 
             // Arm extension control
-            if (gamepad2.x && verticle) {
+            if (gamepad2.x && vertical) {
                 arm.setVelocity(0);
             }
-            if (gamepad2.right_bumper && verticle) {
+            if (gamepad2.right_bumper && vertical) {
                 arm.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
             }
-            if(gamepad2.y && verticle) {
+            if(gamepad2.y && vertical) {
                 arm.setTargetPosition(-2750);
                 arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 arm.setVelocity(4000);
             }
-            if(gamepad2.a && verticle) {
+            if(gamepad2.a && vertical) {
                 arm.setTargetPosition(0);
                 arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 arm.setVelocity(4000);
             }
-            if (gamepad2.ps && verticle) {
+            if (gamepad2.ps && vertical) {
                 arm.setTargetPosition(-1900);
                 arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 arm.setVelocity(4000);
             }
-            // Telemetry data for arm
-            telemetry.addData("Arm Velocity: ", arm.getVelocity());
-            telemetry.addData("Arm Ext Position: ", arm.getCurrentPosition());
 
             // This is wear the arm servo (hand) code will go
-            if (gamepad2.dpad_down && verticle) {
+            if (gamepad2.dpad_down && vertical) {
                 hand.setPosition(1);
             }
-            if(gamepad2.dpad_right && verticle) {
+            if(gamepad2.dpad_right && vertical) {
                 hand.setPosition(0.85);
             }
-            if(gamepad2.dpad_left && verticle) {
+            if(gamepad2.dpad_left && vertical) {
                 hand.setPosition(0.1);
             }
-            // Telemetry data for and
-            telemetry.addData("Position: ", hand.getController().getServoPosition(0));
 
             // Adjusts percentage of wheel power
             if (percent < 100 && gamepad1.dpad_up && !dpadUp) {
@@ -228,9 +253,26 @@ public class TeleOpFinal extends LinearOpMode {
             drive(x, y, rotate, percent);
 
             // adding telemetry data
-            telemetry.addData("Drive", drive);
-            telemetry.addData("Strafe", strafe);
-            telemetry.addData("Rotate", rotate);
+            telemetry.addLine("Robot Data");
+            // Displays the current drive mode
+            telemetry.addData("Field Centric Mode", fieldCentric);
+            telemetry.addData("Robot Position (X axis)", angles.firstAngle);
+            telemetry.addData("Vertical Slide Mode", vertical);
+
+            telemetry.addLine("\nVertical Arm Data");
+            telemetry.addData("Vertical Arm Ext Position: ", arm.getCurrentPosition());
+            telemetry.addData("Vertical Bucket Position: ", hand.getController().getServoPosition(0));
+
+            telemetry.addLine("\nHorizontal Arm Data");
+            telemetry.addData("Right Servo Position", intakeRight.getController().getServoPosition(intakeRight.getPortNumber()));
+            telemetry.addData("Left Servo Position", intakeLeft.getController().getServoPosition(intakeLeft.getPortNumber()));
+            telemetry.addData("Horizontal Arm Pivot Position", intakeMotor.getCurrentPosition());
+            telemetry.addData("Horizontal Slide Position", hSlide.getCurrentPosition());
+
+            telemetry.addLine("\nDrive Data");
+//            telemetry.addData("Drive", drive);
+//            telemetry.addData("Strafe", strafe);
+//            telemetry.addData("Rotate", rotate);
             telemetry.addData("Percent Power", percent);
             telemetry.addData("Left Front Power", leftFront.getPower());
             telemetry.addData("Right Front Power", rightFront.getPower());
