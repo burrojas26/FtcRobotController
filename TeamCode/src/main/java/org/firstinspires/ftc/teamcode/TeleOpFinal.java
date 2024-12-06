@@ -171,6 +171,9 @@ public class TeleOpFinal extends LinearOpMode {
             // Pre-programmed instructions and manual control
             if (gamepad2.x && !vertical) {
                 hSlide.setVelocity(0);
+                hSlide.setTargetPosition(arm.getCurrentPosition());
+                hSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                hSlide.setVelocity(50);
             }
             if (gamepad2.right_bumper && !vertical) {
                 hSlide.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -196,6 +199,9 @@ public class TeleOpFinal extends LinearOpMode {
             // Arm extension control
             if (gamepad2.x && vertical) {
                 arm.setVelocity(0);
+                arm.setTargetPosition(arm.getCurrentPosition());
+                arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                arm.setVelocity(50);
             }
             if (gamepad2.right_bumper && vertical) {
                 arm.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
