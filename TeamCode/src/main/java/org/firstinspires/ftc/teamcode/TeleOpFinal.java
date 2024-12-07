@@ -181,7 +181,7 @@ public class TeleOpFinal extends LinearOpMode {
                 hSlide.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
             }
             if(gamepad2.y && !vertical) {
-                hSlide.setTargetPosition(1000); // CHANGE THIS VALUE
+                hSlide.setTargetPosition(-1000); // CHANGE THIS VALUE
                 hSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 hSlide.setVelocity(4000); // CHANGE THIS VALUE
             }
@@ -192,7 +192,7 @@ public class TeleOpFinal extends LinearOpMode {
             }
             // Allows the horizontal slide to be controlled by the right joystick
             if (!gamepad2.left_bumper && !vertical) {
-                float increase = gamepad2.right_stick_y*200; // Add a - sign depending on how the motor is orientated
+                float increase = gamepad2.right_stick_y*500;
                 hSlide.setTargetPosition((int)(hSlide.getCurrentPosition()+increase));
                 hSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 hSlide.setVelocity(4000); // CHANGE THIS VALUE
