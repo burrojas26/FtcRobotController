@@ -86,6 +86,8 @@ public class TeleOpFinal extends LinearOpMode {
         // Setting the position of the intakeArm to 0 at initialization
         intakeMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
 
+        hSlide.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+
 
         waitForStart();
 
@@ -157,7 +159,7 @@ public class TeleOpFinal extends LinearOpMode {
             }
             // Control horizontal arm pivot
             if (!gamepad2.left_bumper && !vertical) {
-                float increase = gamepad2.left_stick_y*20;
+                float increase = gamepad2.left_stick_y*75;
                 intakeMotor.setTargetPosition((int)(intakeMotor.getCurrentPosition()+increase));
                 intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 intakeMotor.setVelocity(100);
@@ -179,21 +181,21 @@ public class TeleOpFinal extends LinearOpMode {
                 hSlide.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
             }
             if(gamepad2.y && !vertical) {
-                hSlide.setTargetPosition(100); // CHANGE THIS VALUE
+                hSlide.setTargetPosition(1000); // CHANGE THIS VALUE
                 hSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                hSlide.setVelocity(400); // CHANGE THIS VALUE
+                hSlide.setVelocity(4000); // CHANGE THIS VALUE
             }
             if(gamepad2.a && !vertical) {
                 hSlide.setTargetPosition(0);
                 hSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                hSlide.setVelocity(400); // CHANGE THIS VALUE
+                hSlide.setVelocity(4000); // CHANGE THIS VALUE
             }
             // Allows the horizontal slide to be controlled by the right joystick
             if (!gamepad2.left_bumper && !vertical) {
-                float increase = gamepad2.right_stick_y*20; // Add a - sign depending on how the motor is orientated
+                float increase = gamepad2.right_stick_y*200; // Add a - sign depending on how the motor is orientated
                 hSlide.setTargetPosition((int)(hSlide.getCurrentPosition()+increase));
                 hSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                hSlide.setVelocity(250); // CHANGE THIS VALUE
+                hSlide.setVelocity(4000); // CHANGE THIS VALUE
             }
 
             // Arm extension control
