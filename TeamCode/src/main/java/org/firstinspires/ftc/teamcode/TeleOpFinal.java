@@ -101,6 +101,8 @@ public class TeleOpFinal extends LinearOpMode {
         boolean fieldCentric = false;
         boolean bBtn = false;
         boolean vertical = true;
+        int hSlideMax = -100;
+        int vSlideMax = -2750;
         intakeRight.getController().setServoPosition(intakeRight.getPortNumber(), 0);
         intakeLeft.getController().setServoPosition(intakeLeft.getPortNumber(), 1);
 
@@ -193,9 +195,11 @@ public class TeleOpFinal extends LinearOpMode {
             // Allows the horizontal slide to be controlled by the right joystick
             if (!gamepad2.left_bumper && !vertical) {
                 float increase = gamepad2.right_stick_y*500;
-                hSlide.setTargetPosition((int)(hSlide.getCurrentPosition()+increase));
-                hSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                hSlide.setVelocity(4000); // CHANGE THIS VALUE
+                if (hSlide.getCurrentPosition()+increase < hSlideMax) {
+                    hSlide.setTargetPosition((int)(hSlide.getCurrentPosition()+increase));
+                    hSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    hSlide.setVelocity(4000); // CHANGE THIS VALUE
+                }
             }
 
             // Arm extension control
@@ -209,7 +213,7 @@ public class TeleOpFinal extends LinearOpMode {
                 arm.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
             }
             if(gamepad2.y && vertical) {
-                arm.setTargetPosition(-2750);
+                arm.setTargetPosition(vSlideMax);
                 arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 arm.setVelocity(4000);
             }
@@ -222,6 +226,15 @@ public class TeleOpFinal extends LinearOpMode {
                 arm.setTargetPosition(-1900);
                 arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 arm.setVelocity(4000);
+            }
+            // Allows for manual control of vertical arm
+            if (!gamepad2.left_bumper && vertical) {
+                float increase = gamepad2.right_stick_y*500;
+                if (arm.getCurrentPosition()+increase < vSlideMax) {
+                    arm.setTargetPosition((int)(arm.getCurrentPosition()+increase));
+                    arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    arm.setVelocity(4000); // CHANGE THIS VALUE
+                }
             }
 
             // This is wear the arm servo (hand) code will go
