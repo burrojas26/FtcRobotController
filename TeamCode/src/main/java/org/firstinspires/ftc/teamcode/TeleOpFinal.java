@@ -100,10 +100,12 @@ public class TeleOpFinal extends LinearOpMode {
         boolean dpadDown = false;
         boolean fieldCentric = false;
         boolean bBtn = false;
+        boolean rtStickBtn = false;
         boolean vertical = true;
         float leftTrig = 0;
-        int hSlideMax = -100;
+        int hSlideMax = -12500;
         int vSlideMax = -2750;
+        boolean manual = false;
         intakeRight.getController().setServoPosition(intakeRight.getPortNumber(), 0);
         intakeLeft.getController().setServoPosition(intakeLeft.getPortNumber(), 1);
 
@@ -138,8 +140,15 @@ public class TeleOpFinal extends LinearOpMode {
             // Switch the mode to horizontal arm
             if (gamepad2.b && !bBtn) {
                 vertical = !vertical;
+                manual = false;
             }
             bBtn = gamepad2.b;
+
+            // Switch the arm mode to automatic
+            if (gamepad2.right_stick_button && !rtStickBtn) {
+                manual = !manual;
+            }
+            rtStickBtn = gamepad2.right_stick_button;
 
             //Active intake servo and pivot code
             // Pick the tile up
@@ -174,67 +183,75 @@ public class TeleOpFinal extends LinearOpMode {
 
             // Active intake extension code
             // Pre-programmed instructions and manual control
-            if (gamepad2.x && !vertical) {
-                hSlide.setVelocity(0);
-                hSlide.setTargetPosition(arm.getCurrentPosition());
-                hSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                hSlide.setVelocity(50);
-            }
-            if (gamepad2.right_bumper && !vertical) {
-                hSlide.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-            }
-            if(gamepad2.y && !vertical) {
-                hSlide.setTargetPosition(-1000); // CHANGE THIS VALUE
-                hSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                hSlide.setVelocity(4000); // CHANGE THIS VALUE
-            }
-            if(gamepad2.a && !vertical) {
-                hSlide.setTargetPosition(0);
-                hSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                hSlide.setVelocity(4000); // CHANGE THIS VALUE
-            }
-            // Allows the horizontal slide to be controlled by the right joystick
-            if (!gamepad2.left_bumper && !vertical) {
-                float increase = gamepad2.right_stick_y*500;
-                if (hSlide.getCurrentPosition()+increase < hSlideMax) {
-                    hSlide.setTargetPosition((int)(hSlide.getCurrentPosition()+increase));
+            if (!manual) {
+                if (gamepad2.x && !vertical) {
+                    hSlide.setVelocity(0);
+                    hSlide.setTargetPosition(arm.getCurrentPosition());
                     hSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    hSlide.setVelocity(4000); // CHANGE THIS VALUE
+                    hSlide.setVelocity(50);
+                }
+                if (gamepad2.right_bumper && !vertical) {
+                    hSlide.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+                }
+                if (gamepad2.y && !vertical) {
+                    hSlide.setTargetPosition(hSlideMax); // CHANGE THIS VALUE
+                    hSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    hSlide.setVelocity(6000); // CHANGE THIS VALUE
+                }
+                if (gamepad2.a && !vertical) {
+                    hSlide.setTargetPosition(0);
+                    hSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    hSlide.setVelocity(6000); // CHANGE THIS VALUE
+                }
+            }
+            else {
+                // Allows the horizontal slide to be controlled by the right joystick
+                if (!gamepad2.left_bumper && !vertical) {
+                    float increase = gamepad2.right_stick_y * 500;
+                    if (hSlide.getCurrentPosition()+increase > hSlideMax && hSlide.getCurrentPosition()+increase < 0) {
+                        hSlide.setTargetPosition((int) (hSlide.getCurrentPosition() + increase));
+                        hSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        hSlide.setVelocity(6000);
+                    }
                 }
             }
 
-            // Arm extension control
-            if (gamepad2.x && vertical) {
-                arm.setVelocity(0);
-                arm.setTargetPosition(arm.getCurrentPosition());
-                arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                arm.setVelocity(50);
-            }
-            if (gamepad2.right_bumper && vertical) {
-                arm.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-            }
-            if(gamepad2.y && vertical) {
-                arm.setTargetPosition(vSlideMax);
-                arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                arm.setVelocity(4000);
-            }
-            if(gamepad2.a && vertical) {
-                arm.setTargetPosition(0);
-                arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                arm.setVelocity(4000);
-            }
-            if (gamepad2.ps && vertical) {
-                arm.setTargetPosition(-1900);
-                arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                arm.setVelocity(4000);
-            }
-            // Allows for manual control of vertical arm
-            if (!gamepad2.left_bumper && vertical) {
-                float increase = gamepad2.right_stick_y*500;
-                if (arm.getCurrentPosition()+increase < vSlideMax) {
-                    arm.setTargetPosition((int)(arm.getCurrentPosition()+increase));
+            // Veryical Arm extension control
+            if (!manual) {
+                if (gamepad2.x && vertical) {
+                    arm.setVelocity(0);
+                    arm.setTargetPosition(arm.getCurrentPosition());
                     arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    arm.setVelocity(4000); // CHANGE THIS VALUE
+                    arm.setVelocity(50);
+                }
+                if (gamepad2.right_bumper && vertical) {
+                    arm.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+                }
+                if (gamepad2.y && vertical) {
+                    arm.setTargetPosition(vSlideMax);
+                    arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    arm.setVelocity(4000);
+                }
+                if (gamepad2.a && vertical) {
+                    arm.setTargetPosition(0);
+                    arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    arm.setVelocity(4000);
+                }
+                if (gamepad2.ps && vertical) {
+                    arm.setTargetPosition(-1900);
+                    arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    arm.setVelocity(4000);
+                }
+            }
+            else {
+                // Allows for manual control of vertical arm
+                if (!gamepad2.left_bumper && vertical) {
+                    float increase = gamepad2.right_stick_y * 500;
+                    if (arm.getCurrentPosition() + increase > vSlideMax && arm.getCurrentPosition() + increase < 0) {
+                        arm.setTargetPosition((int) (arm.getCurrentPosition() + increase));
+                        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        arm.setVelocity(4000); // CHANGE THIS VALUE
+                    }
                 }
             }
 
@@ -298,6 +315,7 @@ public class TeleOpFinal extends LinearOpMode {
             telemetry.addData("Field Centric Mode", fieldCentric);
             telemetry.addData("Robot Position (X axis)", angles.firstAngle);
             telemetry.addData("Vertical Slide Mode", vertical);
+            telemetry.addData("Manual Arm control: ", manual);
 
             telemetry.addLine("\nVertical Arm Data");
             telemetry.addData("Vertical Arm Ext Position: ", arm.getCurrentPosition());
