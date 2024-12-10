@@ -101,6 +101,7 @@ public class TeleOpFinal extends LinearOpMode {
         boolean fieldCentric = false;
         boolean bBtn = false;
         boolean vertical = true;
+        float leftTrig = 0;
         int hSlideMax = -100;
         int vSlideMax = -2750;
         intakeRight.getController().setServoPosition(intakeRight.getPortNumber(), 0);
@@ -254,6 +255,24 @@ public class TeleOpFinal extends LinearOpMode {
             }
             if (percent > 0 && gamepad1.dpad_down && !dpadDown) {
                 percent -= 5;
+            }
+            if (gamepad1.a) {
+                percent = 20;
+            }
+            if (gamepad1.y) {
+                percent = 100;
+            }
+            if (gamepad1.b) {
+                percent = 65;
+            }
+            double before = percent;
+            if (gamepad1.left_trigger == 1.0) {
+                before = percent;
+                percent = 20;
+            }
+            leftTrig = gamepad1.left_trigger;
+            if (gamepad1.left_trigger != 1.0 && leftTrig == 1.0) {
+                percent = before;
             }
 
             // Sets the past gamepad positioning after each pass of while loop to account for newly pressed buttons
