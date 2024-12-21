@@ -356,7 +356,7 @@ public class TeleOpFinal extends LinearOpMode {
         max = Math.max(max, Math.abs(backLeftPower));
         max = Math.max(max, Math.abs(backRightPower));
 
-        if (max > 1.0) {
+        if (max > 1.0 || max < 1.0) {
             frontLeftPower /= max;
             frontRightPower /= max;
             backLeftPower /= max;

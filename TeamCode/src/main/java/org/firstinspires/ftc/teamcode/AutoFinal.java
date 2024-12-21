@@ -5,6 +5,14 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.sun.tools.javac.util.List;
+
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+
+import java.util.ArrayList;
 
 @Autonomous
 public class AutoFinal extends LinearOpMode {
@@ -38,14 +46,34 @@ public class AutoFinal extends LinearOpMode {
         leftBack.setDirection(DcMotorEx.Direction.FORWARD);
         rightBack.setDirection(DcMotorEx.Direction.FORWARD);
 
+        // Initializing the April Tag processor
+        AprilTagProcessor myAprilTagProcessor;
+        // Create the AprilTag processor and assign it to a variable.
+        myAprilTagProcessor = AprilTagProcessor.easyCreateWithDefaults();
+
+        // Making the vision portal
+        VisionPortal myVisionPortal;
+
+        // Create a VisionPortal, with the specified camera and AprilTag processor, and assign it to a variable.
+        myVisionPortal = VisionPortal.easyCreateWithDefaults(hardwareMap.get(WebcamName.class, "Webcam"), myAprilTagProcessor);
+
+//        // Initializing the tensor flow processor
+//        TfodProcessor myTfodProcessor;
+//        // Create the TensorFlow Object Detection processor and assign it to a variable.
+//        myTfodProcessor = TfodProcessor.easyCreateWithDefaults();
+
+
         waitForStart();
         double percent = 65;
         if (opModeIsActive()) {
-//            long stepOne = System.currentTimeMillis() + 2500;
-//            long stepTwo = stepOne + 2000;
-//            while (System.currentTimeMillis() < stepOne) {
-//                drive(1, 0, 0, percent);
-//            }
+            ArrayList<AprilTagDetection> aprilTags = myAprilTagProcessor.getDetections();
+            /*
+            Meta Data available from april tags
+            ID code
+            tag name
+            tag size
+            unit for tag size and estimated position
+             */
             drive(-1, 0, 0, percent);
         }
     }
