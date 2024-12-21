@@ -1,0 +1,1 @@
+ opencv python files from last year, most up-to-date thing i think is opencvA-3.py, cv2 might not be imported, also its not commented, and i did it in a weird manual way that you're kinda not supposed to
