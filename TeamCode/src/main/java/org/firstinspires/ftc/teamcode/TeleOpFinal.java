@@ -300,7 +300,6 @@ public class TeleOpFinal extends LinearOpMode {
 
             telemetry.addLine("\nHorizontal Arm Data");
             telemetry.addData("Right Servo Position", inputServo.getController().getServoPosition(inputServo.getPortNumber()));
-            telemetry.addData("Left Servo Position", intakeLeft.getController().getServoPosition(intakeLeft.getPortNumber()));
             telemetry.addData("Horizontal Arm Pivot Position", intakeMotor.getCurrentPosition());
             telemetry.addData("Horizontal Slide Position", hSlide.getCurrentPosition());
 
