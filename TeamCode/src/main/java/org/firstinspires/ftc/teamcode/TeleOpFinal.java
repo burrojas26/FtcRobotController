@@ -193,7 +193,7 @@ public class TeleOpFinal extends LinearOpMode {
                 }
             }
 
-            // Veryical Arm extension control
+            // Vertical Arm extension control
             if (!manual) {
                 if (gamepad2.x && vertical) {
                     arm.setVelocity(0);
@@ -237,7 +237,7 @@ public class TeleOpFinal extends LinearOpMode {
                 hand.setPosition(1);
             }
             if(gamepad2.dpad_right && vertical) {
-                hand.setPosition(0.85);
+                hand.setPosition(0.94);
             }
             if(gamepad2.dpad_left && vertical) {
                 hand.setPosition(0.1);
