@@ -24,11 +24,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 
 
 @TeleOp
-
 public class TeleOpFinal extends LinearOpMode {
-
-
-
     //Variables
     IMU imu;
     Orientation angles;
@@ -38,31 +34,23 @@ public class TeleOpFinal extends LinearOpMode {
     DcMotorEx rightBack;
     DcMotorEx arm;
     Servo hand;
-    CRServo intakeLeft;
-    CRServo intakeRight;
+    CRServo inputServo;
     DcMotorEx intakeMotor;
     DcMotorEx hSlide;
-    //DcMotorEx intakeRotate;
 
     @Override
 
     public void runOpMode() {
-
-        //calculations for PIDF values from First Global Motor PIDF Tuning guide - values used for velocity control
-
-
-
-        // Initializing hardware
         // Get the IMU instance
         imu = hardwareMap.get(IMU.class, "imu");
+        // Initializing hardware
         leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
         leftBack = hardwareMap.get(DcMotorEx.class, "leftBack");
         rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
         rightBack = hardwareMap.get(DcMotorEx.class, "rightBack");
         arm = hardwareMap.get(DcMotorEx.class, "slide");
         hand = hardwareMap.get(Servo.class, "hand");
-        intakeLeft = hardwareMap.get(CRServo.class, "intakeLeft");
-        intakeRight = hardwareMap.get(CRServo.class, "intakeRight");
+        inputServo = hardwareMap.get(CRServo.class, "intakeRight");
         intakeMotor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
         hSlide = hardwareMap.get(DcMotorEx.class, "hSlide");
 
@@ -106,8 +94,7 @@ public class TeleOpFinal extends LinearOpMode {
         int hSlideMax = -12500;
         int vSlideMax = -2750;
         boolean manual = false;
-        intakeRight.getController().setServoPosition(intakeRight.getPortNumber(), 0);
-        intakeLeft.getController().setServoPosition(intakeLeft.getPortNumber(), 1);
+        inputServo.getController().setServoPosition(inputServo.getPortNumber(), 0);
 
         while (opModeIsActive()) {
             // Getting inputs for driving
@@ -150,38 +137,28 @@ public class TeleOpFinal extends LinearOpMode {
             }
             rtStickBtn = gamepad2.right_stick_button;
 
-            //Active intake servo and pivot code
-            // Pick the tile up
+            // Active intake servo and pivot code
+            // Spin the wheel to pick tiles up
             if (gamepad2.dpad_up && !vertical) {
-                intakeRight.getController().setServoPosition(intakeRight.getPortNumber(), 1);
-                intakeLeft.getController().setServoPosition(intakeLeft.getPortNumber(), 0);
-                // Waits until the servos complete 5 cycles
-                while (intakeRight.getPower() != 0) {}
-                intakeMotor.setTargetPosition(-100);
-                intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                intakeMotor.setVelocity(150);
+                inputServo.getController().setServoPosition(inputServo.getPortNumber(), 1);
             }
-            // Reset intake
+            // Spin the wheel to output the tiles
             if (gamepad2.dpad_down && !vertical) {
-                intakeRight.getController().setServoPosition(intakeRight.getPortNumber(), 0);
-                intakeLeft.getController().setServoPosition(intakeLeft.getPortNumber(), 1);
-                intakeMotor.setTargetPosition(0);
-                intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                intakeMotor.setVelocity(100);
+                inputServo.getController().setServoPosition(inputServo.getPortNumber(), 0);
             }
             // Control horizontal arm pivot
             if (!gamepad2.left_bumper && !vertical) {
                 float increase = gamepad2.left_stick_y*75;
                 intakeMotor.setTargetPosition((int)(intakeMotor.getCurrentPosition()+increase));
                 intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                intakeMotor.setVelocity(100);
+                intakeMotor.setVelocity(400);
             }
             // Reset encoder for horizontal arm pivot
             if (gamepad2.dpad_left && !vertical) {
                 intakeMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
             }
 
-            // Active intake extension code
+            // Horizontal Arm extension code
             // Pre-programmed instructions and manual control
             if (!manual) {
                 if (gamepad2.x && !vertical) {
@@ -322,7 +299,7 @@ public class TeleOpFinal extends LinearOpMode {
             telemetry.addData("Vertical Bucket Position: ", hand.getController().getServoPosition(0));
 
             telemetry.addLine("\nHorizontal Arm Data");
-            telemetry.addData("Right Servo Position", intakeRight.getController().getServoPosition(intakeRight.getPortNumber()));
+            telemetry.addData("Right Servo Position", inputServo.getController().getServoPosition(inputServo.getPortNumber()));
             telemetry.addData("Left Servo Position", intakeLeft.getController().getServoPosition(intakeLeft.getPortNumber()));
             telemetry.addData("Horizontal Arm Pivot Position", intakeMotor.getCurrentPosition());
             telemetry.addData("Horizontal Slide Position", hSlide.getCurrentPosition());
@@ -342,7 +319,6 @@ public class TeleOpFinal extends LinearOpMode {
     } // Run Op Mode
 
     // Drive function
-    // https://youtu.be/gnSW2QpkGXQ?si=S0n82yAB5Zl1MYK9 (shows a more complex method for programming mechanum wheels)
     public void drive(double drive, double strafe, double rotate, double percent) {
         // The percent variable is used to set the motor power to that percent
         // Algorithm adapted from ChatGPT
