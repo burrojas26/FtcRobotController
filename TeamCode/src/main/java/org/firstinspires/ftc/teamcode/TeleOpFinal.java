@@ -94,13 +94,18 @@ public class TeleOpFinal extends LinearOpMode {
         int hSlideMax = -12500;
         int vSlideMax = -2750;
         boolean manual = false;
+        Gamepad game1 = gamepad1;
+        Gamepad game2 = gamepad2;
         inputServo.getController().setServoPosition(inputServo.getPortNumber(), 0);
 
         while (opModeIsActive()) {
+            // Sets the gamepad variables
+            game1 = gamepad1;
+            game2 = gamepad2;
             // Getting inputs for driving
-            double strafe = gamepad1.left_stick_x;
-            double drive = -gamepad1.left_stick_y;
-            double rotate = gamepad1.right_stick_x;
+            double strafe = game1.left_stick_x;
+            double drive = -game1.left_stick_y;
+            double rotate = game1.right_stick_x;
 
 
             // Get the robot's current heading in radians
@@ -112,70 +117,72 @@ public class TeleOpFinal extends LinearOpMode {
             double newX = strafe * Math.cos(robotHeading) - drive * Math.sin(robotHeading);
             double newY = strafe * Math.sin(robotHeading) + drive * Math.cos(robotHeading);
 
-
             // Allows gamepad2 to take over driving
             if (gamepad2.left_bumper) {
-                strafe = gamepad2.left_stick_x;
-                drive = -gamepad2.left_stick_y;
-                rotate = -gamepad2.right_stick_x;
+                game1 = gamepad2;
+            }
+
+            // Allows gamepad1 to take over arm control
+            if (gamepad1.left_bumper) {
+                game2 = gamepad1;
             }
 
             // Toggles between field centric and robot centric
-            if (gamepad1.ps) {
+            if (game1.ps) {
                 fieldCentric = !fieldCentric;
             }
             // Switch the mode to horizontal arm
-            if (gamepad2.b && !bBtn) {
+            if (game2.b && !bBtn) {
                 vertical = !vertical;
                 manual = false;
             }
-            bBtn = gamepad2.b;
+            bBtn = game2.b;
 
             // Switch the arm mode to automatic
-            if (gamepad2.right_stick_button && !rtStickBtn) {
+            if (game2.right_stick_button && !rtStickBtn) {
                 manual = !manual;
             }
-            rtStickBtn = gamepad2.right_stick_button;
+            rtStickBtn = game2.right_stick_button;
 
             // Active intake servo and pivot code
             // Spin the wheel to pick tiles up
-            if (gamepad2.dpad_up && !vertical) {
+            if (game2.dpad_up && !vertical) {
                 inputServo.getController().setServoPosition(inputServo.getPortNumber(), 1);
             }
             // Spin the wheel to output the tiles
-            if (gamepad2.dpad_down && !vertical) {
+            if (game2.dpad_down && !vertical) {
                 inputServo.getController().setServoPosition(inputServo.getPortNumber(), 0);
             }
             // Control horizontal arm pivot
-            if (!gamepad2.left_bumper && !vertical) {
-                float increase = gamepad2.left_stick_y*75;
+            if (!vertical) {
+                float increase = game2.left_stick_y*75;
                 intakeMotor.setTargetPosition((int)(intakeMotor.getCurrentPosition()+increase));
                 intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 intakeMotor.setVelocity(400);
             }
             // Reset encoder for horizontal arm pivot
-            if (gamepad2.dpad_left && !vertical) {
+            if (game2.dpad_left && !vertical) {
                 intakeMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
             }
 
             // Horizontal Arm extension code
             // Pre-programmed instructions and manual control
             if (!manual) {
-                if (gamepad2.x && !vertical) {
+                if (game2.x && !vertical) {
                     hSlide.setVelocity(0);
                     hSlide.setTargetPosition(arm.getCurrentPosition());
                     hSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     hSlide.setVelocity(50);
                 }
-                if (gamepad2.right_bumper && !vertical) {
+                if (game2.right_bumper && !vertical) {
                     hSlide.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
                 }
-                if (gamepad2.y && !vertical) {
+                if (game2.y && !vertical) {
                     hSlide.setTargetPosition(hSlideMax); // CHANGE THIS VALUE
                     hSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     hSlide.setVelocity(6000); // CHANGE THIS VALUE
                 }
-                if (gamepad2.a && !vertical) {
+                if (game2.a && !vertical) {
                     hSlide.setTargetPosition(0);
                     hSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     hSlide.setVelocity(6000); // CHANGE THIS VALUE
@@ -183,8 +190,8 @@ public class TeleOpFinal extends LinearOpMode {
             }
             else {
                 // Allows the horizontal slide to be controlled by the right joystick
-                if (!gamepad2.left_bumper && !vertical) {
-                    float increase = gamepad2.right_stick_y * 500;
+                if (!game2.left_bumper && !vertical) {
+                    float increase = game2.right_stick_y * 500;
                     if (hSlide.getCurrentPosition()+increase > hSlideMax && hSlide.getCurrentPosition()+increase < 0) {
                         hSlide.setTargetPosition((int) (hSlide.getCurrentPosition() + increase));
                         hSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -195,26 +202,26 @@ public class TeleOpFinal extends LinearOpMode {
 
             // Vertical Arm extension control
             if (!manual) {
-                if (gamepad2.x && vertical) {
+                if (game2.x && vertical) {
                     arm.setVelocity(0);
                     arm.setTargetPosition(arm.getCurrentPosition());
                     arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     arm.setVelocity(50);
                 }
-                if (gamepad2.right_bumper && vertical) {
+                if (game2.right_bumper && vertical) {
                     arm.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
                 }
-                if (gamepad2.y && vertical) {
+                if (game2.y && vertical) {
                     arm.setTargetPosition(vSlideMax);
                     arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     arm.setVelocity(4000);
                 }
-                if (gamepad2.a && vertical) {
+                if (game2.a && vertical) {
                     arm.setTargetPosition(0);
                     arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     arm.setVelocity(4000);
                 }
-                if (gamepad2.ps && vertical) {
+                if (game2.ps && vertical) {
                     arm.setTargetPosition(-1900);
                     arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     arm.setVelocity(4000);
@@ -222,8 +229,8 @@ public class TeleOpFinal extends LinearOpMode {
             }
             else {
                 // Allows for manual control of vertical arm
-                if (!gamepad2.left_bumper && vertical) {
-                    float increase = gamepad2.right_stick_y * 500;
+                if (!game2.left_bumper && vertical) {
+                    float increase = game2.right_stick_y * 500;
                     if (arm.getCurrentPosition() + increase > vSlideMax && arm.getCurrentPosition() + increase < 0) {
                         arm.setTargetPosition((int) (arm.getCurrentPosition() + increase));
                         arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -233,45 +240,45 @@ public class TeleOpFinal extends LinearOpMode {
             }
 
             // This is wear the arm servo (hand) code will go
-            if (gamepad2.dpad_down && vertical) {
+            if (game2.dpad_down && vertical) {
                 hand.setPosition(1);
             }
-            if(gamepad2.dpad_right && vertical) {
+            if(game2.dpad_right && vertical) {
                 hand.setPosition(0.94);
             }
-            if(gamepad2.dpad_left && vertical) {
+            if(game2.dpad_left && vertical) {
                 hand.setPosition(0.1);
             }
 
             // Adjusts percentage of wheel power
-            if (percent < 100 && gamepad1.dpad_up && !dpadUp) {
+            if (percent < 100 && game1.dpad_up && !dpadUp) {
                 percent += 5;
             }
-            if (percent > 0 && gamepad1.dpad_down && !dpadDown) {
+            if (percent > 0 && game1.dpad_down && !dpadDown) {
                 percent -= 5;
             }
-            if (gamepad1.a) {
+            if (game1.a) {
                 percent = 20;
             }
-            if (gamepad1.y) {
+            if (game1.y) {
                 percent = 100;
             }
-            if (gamepad1.b) {
+            if (game1.b) {
                 percent = 65;
             }
             double before = percent;
-            if (gamepad1.left_trigger == 1.0) {
+            if (game1.left_trigger == 1.0) {
                 before = percent;
                 percent = 20;
             }
-            leftTrig = gamepad1.left_trigger;
-            if (gamepad1.left_trigger != 1.0 && leftTrig == 1.0) {
+            leftTrig = game1.left_trigger;
+            if (game1.left_trigger != 1.0 && leftTrig == 1.0) {
                 percent = before;
             }
 
             // Sets the past gamepad positioning after each pass of while loop to account for newly pressed buttons
-            dpadUp = gamepad1.dpad_up;
-            dpadDown = gamepad1.dpad_down;
+            dpadUp = game1.dpad_up;
+            dpadDown = game1.dpad_down;
 
             // Calls drive function and changes inputs whether the robot is in field or robot centric mode
             double x;
@@ -284,7 +291,7 @@ public class TeleOpFinal extends LinearOpMode {
                 y = strafe;
                 x = drive;
             }
-            drive(x, y, rotate, percent);
+            drive(x, y, rotate, percent, game1);
 
             // adding telemetry data
             telemetry.addLine("Robot Data");
@@ -318,7 +325,7 @@ public class TeleOpFinal extends LinearOpMode {
     } // Run Op Mode
 
     // Drive function
-    public void drive(double drive, double strafe, double rotate, double percent) {
+    public void drive(double drive, double strafe, double rotate, double percent, Gamepad game1) {
         // The percent variable is used to set the motor power to that percent
         // Algorithm adapted from ChatGPT
         double frontLeftPower = drive + strafe + rotate;
@@ -338,7 +345,7 @@ public class TeleOpFinal extends LinearOpMode {
             backRightPower /= max;
         }
 
-        if (!gamepad1.left_bumper) {
+        if (!game1.right_bumper) {
             //sets the power to an inputted percent to control sensitivity
             frontLeftPower *= percent/100;
             frontRightPower *= percent/100;
