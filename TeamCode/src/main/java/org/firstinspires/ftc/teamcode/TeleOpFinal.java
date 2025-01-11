@@ -1,6 +1,6 @@
 /**
  * @author Jasper Burroughs
- * This is the final program for the teleop period in the 2024-25 competition (Into the deep)
+ * The final program for the teleop period in the 2024-25 competition (Into the deep)
  */
 
 
