@@ -59,6 +59,25 @@ The readme.md file located in the [/TeamCode/src/main/java/org/firstinspires/ftc
 
 # Release Information
 
+## Version 10.1.1 (20241102-092223)
+
+### Breaking Changes
+
+* Support for Android Studio Ladybug.  Requires Android Studio Ladybug.  
+
+### Known Issues
+
+* Android Studio Ladybug's bundled JDK is version 21.  JDK 21 has deprecated support for Java 1.8, and Ladybug will warn on this deprecation.
+  OnBotJava only supports Java 1.8, therefore, in order to ensure that software developed using Android Studio will 
+  run within the OnBotJava environment, the targetCompatibility and sourceCompatibility versions for the SDK have been left at VERSION_1_8.
+  FIRST has decided that until it can devote the resources to migrating OnBotJava to a newer version of Java, the deprecation is the 
+  lesser of two non-optimal situations.
+
+### Enhancements
+
+* Added `toString()` method to Pose2D
+* Added `toString()` method to SparkFunOTOS.Pose2D
+
 ## Version 10.1 (20240919-122750)
 
 ### Enhancements
