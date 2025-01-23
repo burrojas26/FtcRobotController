@@ -92,6 +92,7 @@ public class TeleOpFinal extends LinearOpMode {
         boolean vertical = true;
         float leftTrig = 0;
         int hSlideMax = -12500;
+        int hSlideStop = -2752;
         int vSlideMax = -2750;
         boolean manual = false;
         inputServo.getController().setServoPosition(inputServo.getPortNumber(), 0);
@@ -137,126 +138,134 @@ public class TeleOpFinal extends LinearOpMode {
             }
             rtStickBtn = gamepad2.right_stick_button;
 
-            // Active intake servo and pivot code
-            // Spin the servo when the triggers are pressed
-            if (gamepad2.right_trigger != 0 && !vertical && (inputServo.getController().getServoPosition(inputServo.getPortNumber())+0.05) <= 1) {
-                inputServo.getController().setServoPosition(inputServo.getPortNumber(), inputServo.getController().getServoPosition(inputServo.getPortNumber())+0.05);
-            }
-            else if (gamepad2.left_trigger != 0  && !vertical && (inputServo.getController().getServoPosition(inputServo.getPortNumber())-0.05) >= 0) {
-                inputServo.getController().setServoPosition(inputServo.getPortNumber(), inputServo.getController().getServoPosition(inputServo.getPortNumber())-0.05);
-            }
-            else {
-                inputServo.getController().setServoPosition(inputServo.getPortNumber(), inputServo.getController().getServoPosition(inputServo.getPortNumber()));
-            }
+            // Code for when controller is in horizontal mode
+            if (!vertical) {
 
-            if (gamepad2.dpad_up && !vertical) {
-                //-120, -270
-                hand.setPosition(0.94);
-                intakeMotor.setTargetPosition(-270);
-                intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                intakeMotor.setVelocity(600);
-                pause(1500);
-                inputServo.getController().setServoPosition(inputServo.getPortNumber(), 0);
-                pause(2500);
-                intakeMotor.setTargetPosition(-120);
-                intakeMotor.setVelocity(600);
-                //inputServo.getController().setServoPosition(inputServo.getPortNumber(), 1);
-            }
-            // Control horizontal arm pivot
-            if (!gamepad2.left_bumper && !vertical) {
-                float increase = gamepad2.left_stick_y*50;
-                intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                intakeMotor.setTargetPosition((int)(intakeMotor.getCurrentPosition()+increase));
-                intakeMotor.setVelocity(400);
-            }
-            // Reset encoder for horizontal arm pivot
-            if (gamepad2.dpad_left && !vertical) {
-                intakeMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-            }
+                // Active intake servo and pivot code
+                // Spin the servo when the triggers are pressed
+                if (gamepad2.right_trigger != 0 && (inputServo.getController().getServoPosition(inputServo.getPortNumber()) + 0.05) <= 1) {
+                    inputServo.getController().setServoPosition(inputServo.getPortNumber(), inputServo.getController().getServoPosition(inputServo.getPortNumber()) + 0.05);
+                } else if (gamepad2.left_trigger != 0 && (inputServo.getController().getServoPosition(inputServo.getPortNumber()) - 0.05) >= 0) {
+                    inputServo.getController().setServoPosition(inputServo.getPortNumber(), inputServo.getController().getServoPosition(inputServo.getPortNumber()) - 0.05);
+                } else {
+                    inputServo.getController().setServoPosition(inputServo.getPortNumber(), inputServo.getController().getServoPosition(inputServo.getPortNumber()));
+                }
 
-            // Horizontal Arm extension code
-            // Pre-programmed instructions and manual control
-            if (!manual) {
-                if (gamepad2.x && !vertical) {
-                    hSlide.setVelocity(0);
-                    hSlide.setTargetPosition(arm.getCurrentPosition());
+                // Intake Automation Code
+                if (gamepad2.dpad_up) {
+                    hand.setPosition(0.94);
+                    hSlide.setTargetPosition(hSlideStop);
                     hSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    hSlide.setVelocity(50);
+                    hSlide.setVelocity(6000);
+                    pause(3000);
+                    intakeMotor.setTargetPosition(-270);
+                    intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    intakeMotor.setVelocity(600);
+                    pause(1500);
+                    inputServo.getController().setServoPosition(inputServo.getPortNumber(), 0);
+                    pause(2500);
+                    intakeMotor.setTargetPosition(-120);
+                    intakeMotor.setVelocity(600);
+                    //inputServo.getController().setServoPosition(inputServo.getPortNumber(), 1);
                 }
-                if (gamepad2.right_bumper && !vertical) {
-                    hSlide.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+                // Control horizontal arm pivot
+                if (!gamepad2.left_bumper) {
+                    float increase = gamepad2.left_stick_y * 50;
+                    intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    intakeMotor.setTargetPosition((int) (intakeMotor.getCurrentPosition() + increase));
+                    intakeMotor.setVelocity(400);
                 }
-                if (gamepad2.y && !vertical) {
-                    hSlide.setTargetPosition(hSlideMax); // CHANGE THIS VALUE
-                    hSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    hSlide.setVelocity(6000); // CHANGE THIS VALUE
+                // Reset encoder for horizontal arm pivot
+                if (gamepad2.dpad_left) {
+                    intakeMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
                 }
-                if (gamepad2.a && !vertical) {
-                    hSlide.setTargetPosition(0);
-                    hSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    hSlide.setVelocity(6000); // CHANGE THIS VALUE
-                }
-            }
-            else {
-                // Allows the horizontal slide to be controlled by the right joystick
-                if (!gamepad2.left_bumper && !vertical) {
-                    float increase = gamepad2.right_stick_y * 500;
-                    if (hSlide.getCurrentPosition()+increase > hSlideMax && hSlide.getCurrentPosition()+increase < 0) {
-                        hSlide.setTargetPosition((int) (hSlide.getCurrentPosition() + increase));
+
+                // Horizontal Arm extension code
+                // Pre-programmed instructions and manual control
+                if (!manual) {
+                    if (gamepad2.x) {
+                        hSlide.setVelocity(0);
+                        hSlide.setTargetPosition(arm.getCurrentPosition());
+                        hSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        hSlide.setVelocity(50);
+                    }
+                    if (gamepad2.right_bumper) {
+                        hSlide.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+                    }
+                    if (gamepad2.y) {
+                        hSlide.setTargetPosition(hSlideMax);
                         hSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                         hSlide.setVelocity(6000);
                     }
-                }
-            }
-
-            // Vertical Arm extension control
-            if (!manual) {
-                if (gamepad2.x && vertical) {
-                    arm.setVelocity(0);
-                    arm.setTargetPosition(arm.getCurrentPosition());
-                    arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    arm.setVelocity(50);
-                }
-                if (gamepad2.right_bumper && vertical) {
-                    arm.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-                }
-                if (gamepad2.y && vertical) {
-                    arm.setTargetPosition(vSlideMax);
-                    arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    arm.setVelocity(4000);
-                }
-                if (gamepad2.a && vertical) {
-                    arm.setTargetPosition(0);
-                    arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    arm.setVelocity(4000);
-                }
-                if (gamepad2.ps && vertical) {
-                    arm.setTargetPosition(-1900);
-                    arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    arm.setVelocity(4000);
-                }
-            }
-            else {
-                // Allows for manual control of vertical arm
-                if (!gamepad2.left_bumper && vertical) {
-                    float increase = gamepad2.right_stick_y * 500;
-                    if (arm.getCurrentPosition() + increase > vSlideMax && arm.getCurrentPosition() + increase < 0) {
-                        arm.setTargetPosition((int) (arm.getCurrentPosition() + increase));
-                        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                        arm.setVelocity(4000); // CHANGE THIS VALUE
+                    if (gamepad2.a) {
+                        hSlide.setTargetPosition(0);
+                        hSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        hSlide.setVelocity(6000);
+                    }
+                } else {
+                    // Allows the horizontal slide to be controlled by the right joystick
+                    if (!gamepad2.left_bumper) {
+                        float increase = gamepad2.right_stick_y * 500;
+                        if (hSlide.getCurrentPosition() + increase > hSlideMax && hSlide.getCurrentPosition() + increase < 0) {
+                            hSlide.setTargetPosition((int) (hSlide.getCurrentPosition() + increase));
+                            hSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                            hSlide.setVelocity(6000);
+                        }
                     }
                 }
             }
 
-            // This is wear the arm servo (hand) code will go
-            if (gamepad2.dpad_down && vertical) {
-                hand.setPosition(1);
-            }
-            if(gamepad2.dpad_right && vertical) {
-                hand.setPosition(0.94);
-            }
-            if(gamepad2.dpad_left && vertical) {
-                hand.setPosition(0.1);
+            // Controls for when the controller is in vertical mode
+            if (vertical) {
+
+                // Vertical Arm extension control
+                if (!manual) {
+                    if (gamepad2.x) {
+                        arm.setVelocity(0);
+                        arm.setTargetPosition(arm.getCurrentPosition());
+                        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        arm.setVelocity(50);
+                    }
+                    if (gamepad2.right_bumper) {
+                        arm.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+                    }
+                    if (gamepad2.y) {
+                        arm.setTargetPosition(vSlideMax);
+                        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        arm.setVelocity(4000);
+                    }
+                    if (gamepad2.a) {
+                        arm.setTargetPosition(0);
+                        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        arm.setVelocity(4000);
+                    }
+                    if (gamepad2.ps) {
+                        arm.setTargetPosition(-1900);
+                        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        arm.setVelocity(4000);
+                    }
+                } else {
+                    // Allows for manual control of vertical arm
+                    if (!gamepad2.left_bumper) {
+                        float increase = gamepad2.right_stick_y * 500;
+                        if (arm.getCurrentPosition() + increase > vSlideMax && arm.getCurrentPosition() + increase < 0) {
+                            arm.setTargetPosition((int) (arm.getCurrentPosition() + increase));
+                            arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                            arm.setVelocity(4000); // CHANGE THIS VALUE
+                        }
+                    }
+                }
+
+                // This is wear the arm servo (hand) code will go
+                if (gamepad2.dpad_down) {
+                    hand.setPosition(1);
+                }
+                if (gamepad2.dpad_right) {
+                    hand.setPosition(0.94);
+                }
+                if (gamepad2.dpad_left) {
+                    hand.setPosition(0.1);
+                }
             }
 
             // Adjusts percentage of wheel power
