@@ -50,7 +50,7 @@ public class TeleOpFinal extends LinearOpMode {
         rightBack = hardwareMap.get(DcMotorEx.class, "rightBack");
         arm = hardwareMap.get(DcMotorEx.class, "slide");
         hand = hardwareMap.get(Servo.class, "hand");
-        inputServo = hardwareMap.get(CRServo.class, "intakeRight");
+        inputServo = hardwareMap.get(CRServo.class, "inputServo");
         intakeMotor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
         hSlide = hardwareMap.get(DcMotorEx.class, "hSlide");
 
@@ -138,7 +138,7 @@ public class TeleOpFinal extends LinearOpMode {
             rtStickBtn = gamepad2.right_stick_button;
 
             // Active intake servo and pivot code
-            // Spin the wheel to pick tiles up
+            // Spin the servo when the triggers are pressed
             if (gamepad2.right_trigger != 0 && !vertical && (inputServo.getController().getServoPosition(inputServo.getPortNumber())+0.05) <= 1) {
                 inputServo.getController().setServoPosition(inputServo.getPortNumber(), inputServo.getController().getServoPosition(inputServo.getPortNumber())+0.05);
             }
@@ -146,17 +146,18 @@ public class TeleOpFinal extends LinearOpMode {
                 inputServo.getController().setServoPosition(inputServo.getPortNumber(), inputServo.getController().getServoPosition(inputServo.getPortNumber())-0.05);
             }
             else {
-                inputServo.getController().setServoPosition(inputServo.getPortNumber(), .5);
-                //inputServo.getController().setServoPosition(inputServo.getPortNumber(), inputServo.getController().getServoPosition(inputServo.getPortNumber()));
+                inputServo.getController().setServoPosition(inputServo.getPortNumber(), inputServo.getController().getServoPosition(inputServo.getPortNumber()));
             }
-            inputServo.setPower(gamepad2.right_trigger-gamepad2.left_trigger);
+
             if (gamepad2.dpad_up && !vertical) {
                 //-120, -270
                 hand.setPosition(0.94);
-                intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 intakeMotor.setTargetPosition(-270);
+                intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 intakeMotor.setVelocity(600);
+                pause(1500);
                 inputServo.getController().setServoPosition(inputServo.getPortNumber(), 0);
+                pause(2500);
                 intakeMotor.setTargetPosition(-120);
                 intakeMotor.setVelocity(600);
                 //inputServo.getController().setServoPosition(inputServo.getPortNumber(), 1);
@@ -331,6 +332,16 @@ public class TeleOpFinal extends LinearOpMode {
             telemetry.update();
         } // While op mode is active
     } // Run Op Mode
+
+    // Sleep Function
+    public void pause(long time) {
+        try {
+            // Sleep for 2 seconds (2000 milliseconds)
+            Thread.sleep(time);
+        } catch (InterruptedException e) {
+            System.out.println("Thread was interrupted!");
+        }
+    }
 
     // Drive function
     public void drive(double drive, double strafe, double rotate, double percent) {
