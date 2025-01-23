@@ -139,18 +139,33 @@ public class TeleOpFinal extends LinearOpMode {
 
             // Active intake servo and pivot code
             // Spin the wheel to pick tiles up
-            if (gamepad2.dpad_up && !vertical) {
-                inputServo.getController().setServoPosition(inputServo.getPortNumber(), 1);
+            if (gamepad2.right_trigger != 0 && !vertical && (inputServo.getController().getServoPosition(inputServo.getPortNumber())+0.05) <= 1) {
+                inputServo.getController().setServoPosition(inputServo.getPortNumber(), inputServo.getController().getServoPosition(inputServo.getPortNumber())+0.05);
             }
-            // Spin the wheel to output the tiles
-            if (gamepad2.dpad_down && !vertical) {
+            else if (gamepad2.left_trigger != 0  && !vertical && (inputServo.getController().getServoPosition(inputServo.getPortNumber())-0.05) >= 0) {
+                inputServo.getController().setServoPosition(inputServo.getPortNumber(), inputServo.getController().getServoPosition(inputServo.getPortNumber())-0.05);
+            }
+            else {
+                inputServo.getController().setServoPosition(inputServo.getPortNumber(), .5);
+                //inputServo.getController().setServoPosition(inputServo.getPortNumber(), inputServo.getController().getServoPosition(inputServo.getPortNumber()));
+            }
+            inputServo.setPower(gamepad2.right_trigger-gamepad2.left_trigger);
+            if (gamepad2.dpad_up && !vertical) {
+                //-120, -270
+                hand.setPosition(0.94);
+                intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                intakeMotor.setTargetPosition(-270);
+                intakeMotor.setVelocity(600);
                 inputServo.getController().setServoPosition(inputServo.getPortNumber(), 0);
+                intakeMotor.setTargetPosition(-120);
+                intakeMotor.setVelocity(600);
+                //inputServo.getController().setServoPosition(inputServo.getPortNumber(), 1);
             }
             // Control horizontal arm pivot
             if (!gamepad2.left_bumper && !vertical) {
-                float increase = gamepad2.left_stick_y*75;
-                intakeMotor.setTargetPosition((int)(intakeMotor.getCurrentPosition()+increase));
+                float increase = gamepad2.left_stick_y*50;
                 intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                intakeMotor.setTargetPosition((int)(intakeMotor.getCurrentPosition()+increase));
                 intakeMotor.setVelocity(400);
             }
             // Reset encoder for horizontal arm pivot
