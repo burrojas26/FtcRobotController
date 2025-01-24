@@ -262,7 +262,7 @@ public class TeleOpFinal extends LinearOpMode {
                     hand.setPosition(1);
                 }
                 if (gamepad2.dpad_right) {
-                    hand.setPosition(0.94);
+                    hand.setPosition(0.75);
                 }
                 if (gamepad2.dpad_left) {
                     hand.setPosition(0.25);
