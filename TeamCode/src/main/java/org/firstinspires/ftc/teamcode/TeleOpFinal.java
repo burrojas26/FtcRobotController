@@ -34,7 +34,7 @@ public class TeleOpFinal extends LinearOpMode {
     DcMotorEx rightBack;
     DcMotorEx arm;
     Servo hand;
-    CRServo inputServo;
+    Servo inputServo;
     DcMotorEx intakeMotor;
     DcMotorEx hSlide;
 
@@ -50,7 +50,7 @@ public class TeleOpFinal extends LinearOpMode {
         rightBack = hardwareMap.get(DcMotorEx.class, "rightBack");
         arm = hardwareMap.get(DcMotorEx.class, "slide");
         hand = hardwareMap.get(Servo.class, "hand");
-        inputServo = hardwareMap.get(CRServo.class, "inputServo");
+        inputServo = hardwareMap.get(Servo.class, "inputServo");
         intakeMotor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
         hSlide = hardwareMap.get(DcMotorEx.class, "hSlide");
 
@@ -93,7 +93,7 @@ public class TeleOpFinal extends LinearOpMode {
         float leftTrig = 0;
         int hSlideMax = -12500;
         int hSlideStop = -2752;
-        int vSlideMax = -2750;
+        int vSlideMax = -2600;
         boolean manual = false;
         inputServo.getController().setServoPosition(inputServo.getPortNumber(), 0);
 
@@ -144,35 +144,36 @@ public class TeleOpFinal extends LinearOpMode {
                 // Active intake servo and pivot code
                 // Spin the servo when the triggers are pressed
                 if (gamepad2.right_trigger != 0 && (inputServo.getController().getServoPosition(inputServo.getPortNumber()) + 0.05) <= 1) {
-                    inputServo.getController().setServoPosition(inputServo.getPortNumber(), inputServo.getController().getServoPosition(inputServo.getPortNumber()) + 0.05);
+                    inputServo.getController().setServoPosition(inputServo.getPortNumber(), inputServo.getController().getServoPosition(inputServo.getPortNumber()) + 0.005);
                 } else if (gamepad2.left_trigger != 0 && (inputServo.getController().getServoPosition(inputServo.getPortNumber()) - 0.05) >= 0) {
-                    inputServo.getController().setServoPosition(inputServo.getPortNumber(), inputServo.getController().getServoPosition(inputServo.getPortNumber()) - 0.05);
+                    inputServo.getController().setServoPosition(inputServo.getPortNumber(), inputServo.getController().getServoPosition(inputServo.getPortNumber()) - 0.005);
                 } else {
                     inputServo.getController().setServoPosition(inputServo.getPortNumber(), inputServo.getController().getServoPosition(inputServo.getPortNumber()));
                 }
 
                 // Intake Automation Code
                 if (gamepad2.dpad_up) {
-                    hand.setPosition(0.94);
+                    hand.setPosition(0.92);
                     hSlide.setTargetPosition(hSlideStop);
                     hSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     hSlide.setVelocity(6000);
                     pause(3000);
-                    intakeMotor.setTargetPosition(-270);
+                    intakeMotor.setTargetPosition(-250);
                     intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    intakeMotor.setVelocity(600);
+                    intakeMotor.setVelocity(200);
                     pause(1500);
                     inputServo.getController().setServoPosition(inputServo.getPortNumber(), 0);
-                    pause(2500);
-                    intakeMotor.setTargetPosition(-120);
+                    pause(1500);
+                    intakeMotor.setTargetPosition(-100);
+                    intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     intakeMotor.setVelocity(600);
                     //inputServo.getController().setServoPosition(inputServo.getPortNumber(), 1);
                 }
                 // Control horizontal arm pivot
                 if (!gamepad2.left_bumper) {
                     float increase = gamepad2.left_stick_y * 50;
-                    intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     intakeMotor.setTargetPosition((int) (intakeMotor.getCurrentPosition() + increase));
+                    intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     intakeMotor.setVelocity(400);
                 }
                 // Reset encoder for horizontal arm pivot
@@ -264,7 +265,7 @@ public class TeleOpFinal extends LinearOpMode {
                     hand.setPosition(0.94);
                 }
                 if (gamepad2.dpad_left) {
-                    hand.setPosition(0.1);
+                    hand.setPosition(0.25);
                 }
             }
 
