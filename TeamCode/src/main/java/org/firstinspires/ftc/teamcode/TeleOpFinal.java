@@ -175,25 +175,25 @@ public class TeleOpFinal extends LinearOpMode {
                     });
                     moveHSlide.start();
                     try {
-                        moveHSlide.join();
+                        moveHSlide.join(3500);
                     } catch (InterruptedException e){
                         System.out.println("Error");
                     }
                     pivotArm.start();
                     try {
-                        pivotArm.join();
+                        pivotArm.join(3500);
                     } catch (InterruptedException e){
                         System.out.println("Error");
                     }
                     spinWheel.start();
                     try {
-                        spinWheel.join();
+                        spinWheel.join(3500);
                     } catch (InterruptedException e){
                         System.out.println("Error");
                     }
                     resetArm.start();
                     try {
-                        resetArm.join();
+                        resetArm.join(3500);
                     } catch (InterruptedException e){
                         System.out.println("Error");
                     }
