@@ -152,21 +152,53 @@ public class TeleOpFinal extends LinearOpMode {
                 }
 
                 // Intake Automation Code
+                // Attempting to join the current thread with the main branch so tasks happen one after the other
                 if (gamepad2.dpad_up) {
                     hand.setPosition(0.92);
-                    hSlide.setTargetPosition(hSlideStop);
-                    hSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    hSlide.setVelocity(6000);
-                    pause(3000);
-                    intakeMotor.setTargetPosition(-250);
-                    intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    intakeMotor.setVelocity(200);
-                    pause(1500);
-                    inputServo.getController().setServoPosition(inputServo.getPortNumber(), 0);
-                    pause(1500);
-                    intakeMotor.setTargetPosition(-100);
-                    intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    intakeMotor.setVelocity(600);
+                    Thread moveHSlide = new Thread(() -> {
+                        hSlide.setTargetPosition(hSlideStop);
+                        hSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        hSlide.setVelocity(6000);
+                    });
+                    Thread pivotArm = new Thread(() -> {
+                        intakeMotor.setTargetPosition(-250);
+                        intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        intakeMotor.setVelocity(200);
+                    });
+                    Thread spinWheel = new Thread(() -> {
+                        inputServo.getController().setServoPosition(inputServo.getPortNumber(), 0);
+                    });
+                    Thread resetArm = new Thread(() -> {
+                        intakeMotor.setTargetPosition(-100);
+                        intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        intakeMotor.setVelocity(600);
+                    });
+                    moveHSlide.start();
+                    try {
+                        moveHSlide.join();
+                    } catch (InterruptedException e){
+                        System.out.println("Error");
+                    }
+                    pivotArm.start();
+                    try {
+                        pivotArm.join();
+                    } catch (InterruptedException e){
+                        System.out.println("Error");
+                    }
+                    spinWheel.start();
+                    try {
+                        spinWheel.join();
+                    } catch (InterruptedException e){
+                        System.out.println("Error");
+                    }
+                    resetArm.start();
+                    try {
+                        resetArm.join();
+                    } catch (InterruptedException e){
+                        System.out.println("Error");
+                    }
+
+
                     //inputServo.getController().setServoPosition(inputServo.getPortNumber(), 1);
                 }
                 // Control horizontal arm pivot
