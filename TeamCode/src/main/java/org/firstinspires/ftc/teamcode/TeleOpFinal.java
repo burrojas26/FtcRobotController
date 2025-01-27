@@ -38,8 +38,8 @@ public class TeleOpFinal extends LinearOpMode {
     DcMotorEx hSlide;
 
     double percent;
-    HorizontalMode horizontalMode = new HorizontalMode();
-    VerticalMode verticalMode = new VerticalMode();
+    HorizontalMode horizontalMode;
+    VerticalMode verticalMode;
 
     @Override
 
@@ -56,6 +56,9 @@ public class TeleOpFinal extends LinearOpMode {
         inputServo = hardwareMap.get(Servo.class, "inputServo");
         intakeMotor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
         hSlide = hardwareMap.get(DcMotorEx.class, "hSlide");
+
+        horizontalMode = new HorizontalMode(inputServo, hand, intakeMotor, hSlide, gamepad2);
+        verticalMode = new VerticalMode(arm, hand, gamepad2);
 
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.RIGHT;
         RevHubOrientationOnRobot.UsbFacingDirection  usbDirection  = RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD;
@@ -94,6 +97,7 @@ public class TeleOpFinal extends LinearOpMode {
         boolean rtStickBtn = false;
         boolean vertical = true;
         boolean manual = false;
+        boolean ps = false;
         while (opModeIsActive()) {
             // Getting inputs for driving
             double strafe = gamepad1.left_stick_x;
@@ -107,11 +111,11 @@ public class TeleOpFinal extends LinearOpMode {
             double robotHeading = Math.toRadians(angles.firstAngle);
 
             // Field-centric transformation using Rotation Matrix
-            double newX = strafe * Math.cos(robotHeading) - drive * Math.sin(robotHeading);
-            double newY = strafe * Math.sin(robotHeading) + drive * Math.cos(robotHeading);
+            double newX = strafe * Math.cos(robotHeading) + drive * Math.sin(robotHeading);
+            double newY = -strafe * Math.sin(robotHeading) + drive * Math.cos(robotHeading);
 
             // Automatically stops everything
-            if (gamepad1.start || gamepad2.start) stopAll();
+            if (gamepad1.back || gamepad2.back) stopAll();
 
             // Allows gamepad2 to take over driving
             if (gamepad2.left_bumper) {
@@ -121,9 +125,10 @@ public class TeleOpFinal extends LinearOpMode {
             }
 
             // Toggles between field centric and robot centric
-            if (gamepad1.ps) {
+            if (gamepad1.ps && !ps) {
                 fieldCentric = !fieldCentric;
             }
+            ps = gamepad1.ps;
             // Switch the mode to horizontal arm
             if (gamepad2.b && !bBtn) {
                 vertical = !vertical;
