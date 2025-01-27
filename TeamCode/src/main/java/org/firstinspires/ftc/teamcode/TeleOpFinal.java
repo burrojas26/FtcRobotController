@@ -22,7 +22,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-
 @TeleOp
 public class TeleOpFinal extends LinearOpMode {
     //Variables
@@ -37,6 +36,10 @@ public class TeleOpFinal extends LinearOpMode {
     Servo inputServo;
     DcMotorEx intakeMotor;
     DcMotorEx hSlide;
+
+    double percent;
+    HorizontalMode horizontalMode = new HorizontalMode();
+    VerticalMode verticalMode = new VerticalMode();
 
     @Override
 
@@ -83,20 +86,14 @@ public class TeleOpFinal extends LinearOpMode {
         Percent is the percentage of power for driving
         PastGP is a gamepad that is reset at every run of the while loop
         */
-        double percent = 65;
+        percent = 65;
         boolean dpadUp = false;
         boolean dpadDown = false;
         boolean fieldCentric = false;
         boolean bBtn = false;
         boolean rtStickBtn = false;
         boolean vertical = true;
-        float leftTrig = 0;
-        int hSlideMax = -12500;
-        int hSlideStop = -2752;
-        int vSlideMax = -2600;
         boolean manual = false;
-        inputServo.getController().setServoPosition(inputServo.getPortNumber(), 0);
-
         while (opModeIsActive()) {
             // Getting inputs for driving
             double strafe = gamepad1.left_stick_x;
@@ -113,12 +110,14 @@ public class TeleOpFinal extends LinearOpMode {
             double newX = strafe * Math.cos(robotHeading) - drive * Math.sin(robotHeading);
             double newY = strafe * Math.sin(robotHeading) + drive * Math.cos(robotHeading);
 
+            // Automatically stops everything
+            if (gamepad1.start || gamepad2.start) stopAll();
 
             // Allows gamepad2 to take over driving
             if (gamepad2.left_bumper) {
                 strafe = gamepad2.left_stick_x;
                 drive = -gamepad2.left_stick_y;
-                rotate = -gamepad2.right_stick_x;
+                rotate = gamepad2.right_stick_x;
             }
 
             // Toggles between field centric and robot centric
@@ -152,148 +151,45 @@ public class TeleOpFinal extends LinearOpMode {
                 }
 
                 // Intake Automation Code
-                if (gamepad2.dpad_up) {
-                    hand.setPosition(0.92);
-                    hSlide.setTargetPosition(hSlideStop);
-                    hSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    hSlide.setVelocity(6000);
-                    pause(3000);
-                    intakeMotor.setTargetPosition(-250);
-                    intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    intakeMotor.setVelocity(200);
-                    pause(1500);
-                    inputServo.getController().setServoPosition(inputServo.getPortNumber(), 0);
-                    pause(1500);
-                    intakeMotor.setTargetPosition(-100);
-                    intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    intakeMotor.setVelocity(600);
-                    //inputServo.getController().setServoPosition(inputServo.getPortNumber(), 1);
-                }
+                if (gamepad2.dpad_up) horizontalMode.activateIntake();
                 // Control horizontal arm pivot
-                if (!gamepad2.left_bumper) {
-                    float increase = gamepad2.left_stick_y * 50;
-                    intakeMotor.setTargetPosition((int) (intakeMotor.getCurrentPosition() + increase));
-                    intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    intakeMotor.setVelocity(400);
-                }
+                if (!gamepad2.left_bumper) horizontalMode.intakeManual();
                 // Reset encoder for horizontal arm pivot
-                if (gamepad2.dpad_left) {
-                    intakeMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-                }
+                if (gamepad2.dpad_left) horizontalMode.resetIntake();
 
                 // Horizontal Arm extension code
                 // Pre-programmed instructions and manual control
                 if (!manual) {
-                    if (gamepad2.x) {
-                        hSlide.setVelocity(0);
-                        hSlide.setTargetPosition(arm.getCurrentPosition());
-                        hSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                        hSlide.setVelocity(50);
-                    }
-                    if (gamepad2.right_bumper) {
-                        hSlide.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-                    }
-                    if (gamepad2.y) {
-                        hSlide.setTargetPosition(hSlideMax);
-                        hSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                        hSlide.setVelocity(6000);
-                    }
-                    if (gamepad2.a) {
-                        hSlide.setTargetPosition(0);
-                        hSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                        hSlide.setVelocity(6000);
-                    }
-                } else {
-                    // Allows the horizontal slide to be controlled by the right joystick
-                    if (!gamepad2.left_bumper) {
-                        float increase = gamepad2.right_stick_y * 500;
-                        if (hSlide.getCurrentPosition() + increase > hSlideMax && hSlide.getCurrentPosition() + increase < 0) {
-                            hSlide.setTargetPosition((int) (hSlide.getCurrentPosition() + increase));
-                            hSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                            hSlide.setVelocity(6000);
-                        }
-                    }
-                }
+                    if (gamepad2.x) horizontalMode.stopExt();
+                    if (gamepad2.right_bumper) horizontalMode.resetExt();
+                    if (gamepad2.y) horizontalMode.extendArm();
+                    if (gamepad2.a) horizontalMode.collapseArm();
+                } else if (!gamepad2.left_bumper) horizontalMode.manual();
             }
 
             // Controls for when the controller is in vertical mode
             if (vertical) {
-
                 // Vertical Arm extension control
                 if (!manual) {
-                    if (gamepad2.x) {
-                        arm.setVelocity(0);
-                        arm.setTargetPosition(arm.getCurrentPosition());
-                        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                        arm.setVelocity(50);
-                    }
-                    if (gamepad2.right_bumper) {
-                        arm.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-                    }
-                    if (gamepad2.y) {
-                        arm.setTargetPosition(vSlideMax);
-                        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                        arm.setVelocity(4000);
-                    }
-                    if (gamepad2.a) {
-                        arm.setTargetPosition(0);
-                        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                        arm.setVelocity(4000);
-                    }
-                    if (gamepad2.ps) {
-                        arm.setTargetPosition(-1900);
-                        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                        arm.setVelocity(4000);
-                    }
-                } else {
-                    // Allows for manual control of vertical arm
-                    if (!gamepad2.left_bumper) {
-                        float increase = gamepad2.right_stick_y * 500;
-                        if (arm.getCurrentPosition() + increase > vSlideMax && arm.getCurrentPosition() + increase < 0) {
-                            arm.setTargetPosition((int) (arm.getCurrentPosition() + increase));
-                            arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                            arm.setVelocity(4000); // CHANGE THIS VALUE
-                        }
-                    }
-                }
+                    if (gamepad2.x) verticalMode.stopArm();
+                    if (gamepad2.right_bumper) verticalMode.resetEncode();
+                    if (gamepad2.y) verticalMode.extendArm();
+                    if (gamepad2.a) verticalMode.collapseArm();
+                    if (gamepad2.ps) verticalMode.hang();
+                } else if (!gamepad2.left_bumper) verticalMode.manual();
 
                 // This is wear the arm servo (hand) code will go
-                if (gamepad2.dpad_down) {
-                    hand.setPosition(1);
-                }
-                if (gamepad2.dpad_right) {
-                    hand.setPosition(0.75);
-                }
-                if (gamepad2.dpad_left) {
-                    hand.setPosition(0.25);
-                }
+                if (gamepad2.dpad_down) verticalMode.bucketDown();
+                if (gamepad2.dpad_right) verticalMode.ready();
+                if (gamepad2.dpad_left) verticalMode.dump();
             }
 
             // Adjusts percentage of wheel power
-            if (percent < 100 && gamepad1.dpad_up && !dpadUp) {
-                percent += 5;
-            }
-            if (percent > 0 && gamepad1.dpad_down && !dpadDown) {
-                percent -= 5;
-            }
-            if (gamepad1.a) {
-                percent = 20;
-            }
-            if (gamepad1.y) {
-                percent = 100;
-            }
-            if (gamepad1.b) {
-                percent = 65;
-            }
-            double before = percent;
-            if (gamepad1.left_trigger == 1.0) {
-                before = percent;
-                percent = 20;
-            }
-            leftTrig = gamepad1.left_trigger;
-            if (gamepad1.left_trigger != 1.0 && leftTrig == 1.0) {
-                percent = before;
-            }
+            if (percent < 100 && gamepad1.dpad_up && !dpadUp) percent += 5;
+            if (percent > 0 && gamepad1.dpad_down && !dpadDown) percent -= 5;
+            if (gamepad1.a) percent = 20;
+            if (gamepad1.y) percent = 100;
+            if (gamepad1.b) percent = 65;
 
             // Sets the past gamepad positioning after each pass of while loop to account for newly pressed buttons
             dpadUp = gamepad1.dpad_up;
@@ -343,14 +239,10 @@ public class TeleOpFinal extends LinearOpMode {
         } // While op mode is active
     } // Run Op Mode
 
-    // Sleep Function
-    public void pause(long time) {
-        try {
-            // Sleep for 2 seconds (2000 milliseconds)
-            Thread.sleep(time);
-        } catch (InterruptedException e) {
-            System.out.println("Thread was interrupted!");
-        }
+    public void stopAll() {
+        percent = 0;
+        verticalMode.stopArm();
+        horizontalMode.stopAll();
     }
 
     // Drive function
