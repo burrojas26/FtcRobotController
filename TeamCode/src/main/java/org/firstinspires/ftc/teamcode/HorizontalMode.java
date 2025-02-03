@@ -5,14 +5,29 @@ import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.har
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 
 public class HorizontalMode {
 
-    Servo inputServo = hardwareMap.get(Servo .class, "inputServo");
-    Servo hand = hardwareMap.get(Servo.class, "hand");
-    DcMotorEx intakeMotor = hardwareMap.get(DcMotorEx .class, "intakeMotor");
-    DcMotorEx hSlide = hardwareMap.get(DcMotorEx.class, "hSlide");
+//    Servo inputServo = hardwareMap.get(Servo .class, "inputServo");
+//    Servo hand = hardwareMap.get(Servo.class, "hand");
+//    DcMotorEx intakeMotor = hardwareMap.get(DcMotorEx .class, "intakeMotor");
+//    DcMotorEx hSlide = hardwareMap.get(DcMotorEx.class, "hSlide");
+
+    Servo inputServo;
+    Servo hand;
+    DcMotorEx intakeMotor;
+    DcMotorEx hSlide;
+    Gamepad gamepad2;
+
+    public HorizontalMode(Servo inputServo, Servo hand, DcMotorEx intakeMotor, DcMotorEx hSlide, Gamepad gamepad2) {
+        this.inputServo = inputServo;
+        this.hand = hand;
+        this.intakeMotor = intakeMotor;
+        this.hSlide = hSlide;
+        this.gamepad2 = gamepad2;
+    }
 
     int hSlideMax = -12500;
     int hSlideStop = -2752;
@@ -23,13 +38,13 @@ public class HorizontalMode {
         hSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         hSlide.setVelocity(6000);
         pause(3000);
-        intakeMotor.setTargetPosition(-250);
+        intakeMotor.setTargetPosition(47);
         intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         intakeMotor.setVelocity(200);
         pause(1500);
         inputServo.getController().setServoPosition(inputServo.getPortNumber(), 0);
         pause(1500);
-        intakeMotor.setTargetPosition(-100);
+        intakeMotor.setTargetPosition(82);
         intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         intakeMotor.setVelocity(600);
     }

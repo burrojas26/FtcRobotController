@@ -22,9 +22,18 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 
 public class VerticalMode {
 
-    DcMotorEx arm = hardwareMap.get(DcMotorEx.class, "slide");
-    Servo hand = hardwareMap.get(Servo.class, "hand");
-    int vSlideMax = -2600;
+//    DcMotorEx arm = hardwareMap.get(DcMotorEx.class, "slide");
+//    Servo hand = hardwareMap.get(Servo.class, "hand");
+    DcMotorEx arm;
+    Servo hand;
+    Gamepad gamepad2;
+
+    public VerticalMode(DcMotorEx arm, Servo hand, Gamepad gamepad2) {
+        this.arm = arm;
+        this.hand = hand;
+        this.gamepad2 = gamepad2;
+    }
+    int vSlideMax = -2625;
     int hangPos = -1900;
 
     public void stopArm() {
