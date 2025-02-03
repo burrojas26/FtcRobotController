@@ -66,7 +66,7 @@ public class AutoFinal extends LinearOpMode {
         waitForStart();
         double percent = 65;
         if (opModeIsActive()) {
-            ArrayList<AprilTagDetection> aprilTags = myAprilTagProcessor.getDetections();
+            //ArrayList<AprilTagDetection> aprilTags = myAprilTagProcessor.getDetections();
             /*
             Meta Data available from april tags
             ID code
@@ -74,7 +74,21 @@ public class AutoFinal extends LinearOpMode {
             tag size
             unit for tag size and estimated position
              */
+
             drive(-1, 0, 0, percent);
+            pause(1000);
+            drive(0, 0, 0, percent);
+
+        }
+    }
+
+    // Sleep Function
+    public void pause(long time) {
+        try {
+            // Sleep for 2 seconds (2000 milliseconds)
+            Thread.sleep(time);
+        } catch (InterruptedException e) {
+            System.out.println("Thread was interrupted!");
         }
     }
 
