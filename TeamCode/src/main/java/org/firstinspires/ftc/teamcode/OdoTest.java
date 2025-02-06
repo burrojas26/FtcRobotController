@@ -10,21 +10,17 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
 import java.util.Locale;
 
+@TeleOp
 public class OdoTest extends LinearOpMode {
     GoBildaPinpointDriver odo; // Declare OpMode member for the Odometry Computer
     DcMotorEx leftFront;
     DcMotorEx leftBack;
     DcMotorEx rightFront;
     DcMotorEx rightBack;
-    DcMotorEx arm;
-    Servo hand;
-    Servo inputServo;
-    DcMotorEx intakeMotor;
-    DcMotorEx hSlide;
+
+
 
     double percent;
-    HorizontalMode horizontalMode = new HorizontalMode();
-    VerticalMode verticalMode = new VerticalMode();
     @Override
     public void runOpMode() {
         odo = hardwareMap.get(GoBildaPinpointDriver.class,"odo");
@@ -33,13 +29,13 @@ public class OdoTest extends LinearOpMode {
         leftBack = hardwareMap.get(DcMotorEx.class, "leftBack");
         rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
         rightBack = hardwareMap.get(DcMotorEx.class, "rightBack");
-        arm = hardwareMap.get(DcMotorEx.class, "slide");
-        hand = hardwareMap.get(Servo.class, "hand");
-        inputServo = hardwareMap.get(Servo.class, "inputServo");
-        intakeMotor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
-        hSlide = hardwareMap.get(DcMotorEx.class, "hSlide");
 
-        odo.setOffsets(-84.0, -168.0); //CHANGE THESE VALUES
+        leftFront.setDirection(DcMotorEx.Direction.REVERSE);
+        rightFront.setDirection(DcMotorEx.Direction.REVERSE);
+        leftBack.setDirection(DcMotorEx.Direction.FORWARD);
+        rightBack.setDirection(DcMotorEx.Direction.FORWARD);
+
+        odo.setOffsets(107.3, 0); //CHANGE THESE VALUES
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
         odo.resetPosAndIMU();
@@ -50,7 +46,7 @@ public class OdoTest extends LinearOpMode {
         telemetry.addData("Device Version Number:", odo.getDeviceVersion());
         telemetry.addData("Device Scalar", odo.getYawScalar());
         telemetry.update();
-
+        percent = 50;
         waitForStart();
         boolean dpadUp = false;
         boolean dpadDown = false;
@@ -59,16 +55,32 @@ public class OdoTest extends LinearOpMode {
         int xDistance = 10;
         int yDistance = 10;
         while(opModeIsActive()) {
+            odo.update();
             if (!dpadUp && gamepad1.dpad_up)  yDistance+=5;
+            dpadUp = gamepad1.dpad_up;
             if (!dpadDown && gamepad1.dpad_down)  yDistance-=5;
+            dpadDown = gamepad1.dpad_down;
             if (!dpadleft && gamepad1.dpad_left)  xDistance-=5;
+            dpadleft = gamepad1.dpad_left;
             if (!dpadright && gamepad1.dpad_right)  xDistance+=5;
+            dpadright = gamepad1.dpad_right;
             if (gamepad1.a) {
-                drive(1, 0, 0, 50);
-                while (odo.getPosX() < xDistance) continue;
-                drive(0, 1, 0, 50);
-                while (odo.getPosY() <yDistance) continue;
+                drive(1, 0, 0, percent);
+                while (odo.getPosition().getX(DistanceUnit.MM) < xDistance) updateDrivingTelemetry(xDistance, yDistance);
+                drive(0, 1, 0, percent);
+                while (odo.getPosition().getY(DistanceUnit.MM) <yDistance) updateDrivingTelemetry(xDistance, yDistance);
+
             }
+            // Getting inputs for driving
+            double strafe = gamepad1.left_stick_x;
+            double drive = -gamepad1.left_stick_y;
+            double rotate = gamepad1.right_stick_x;
+            drive(drive, strafe, rotate, percent);
+            //updateDrivingTelemetry(xDistance, yDistance);
+            telemetry.addData("Current X", odo.getPosition().getX(DistanceUnit.MM));
+            telemetry.addData("Current Y", odo.getPosition().getY(DistanceUnit.MM));
+            telemetry.addData("Current Y", odo.getPosition().getHeading(AngleUnit.DEGREES));
+            telemetry.update();
         }
     }
     // Drive function
@@ -106,4 +118,17 @@ public class OdoTest extends LinearOpMode {
         leftBack.setPower(backLeftPower);
         rightBack.setPower(backRightPower);
     }
+    public void updateDrivingTelemetry(double xDistance, double yDistance) {
+        telemetry.addData("Left Front", leftFront.getPower());
+        telemetry.addData("Right Front", rightFront.getPower());
+        telemetry.addData("Left Back", leftBack.getPower());
+        telemetry.addData("Right Back", rightBack.getPower());
+        telemetry.addData("Target X", xDistance);
+        telemetry.addData("Target Y", yDistance);
+        telemetry.addData("Current X", odo.getPosition().getX(DistanceUnit.MM));
+        telemetry.addData("Current Y", odo.getPosition().getY(DistanceUnit.MM));
+        telemetry.addData("Current Z", odo.getHeading());
+        telemetry.update();
+    }
+
 }
