@@ -1,21 +1,16 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Auton;
 
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.CRServo;
-import com.sun.tools.javac.util.List;
-
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
-
-import java.util.ArrayList;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Autonomous
-public class autoVision extends LinearOpMode {
+public class AutoFinal extends LinearOpMode {
 
     //Variables
     DcMotorEx leftFront;
@@ -26,10 +21,12 @@ public class autoVision extends LinearOpMode {
     Servo hand;
     CRServo intake;
     DcMotorEx intakeRotate;
+    IMU imu;
 
     @Override
     public void runOpMode() {
         // Initializing hardware
+        imu = hardwareMap.get(IMU.class, "imu");
         leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
         leftBack = hardwareMap.get(DcMotorEx.class, "leftBack");
         rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
@@ -46,39 +43,24 @@ public class autoVision extends LinearOpMode {
         leftBack.setDirection(DcMotorEx.Direction.FORWARD);
         rightBack.setDirection(DcMotorEx.Direction.FORWARD);
 
-        // Initializing the April Tag processor
-        AprilTagProcessor myAprilTagProcessor;
-        // Create the AprilTag processor and assign it to a variable.
-        myAprilTagProcessor = AprilTagProcessor.easyCreateWithDefaults();
+        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.RIGHT;
+        RevHubOrientationOnRobot.UsbFacingDirection  usbDirection  = RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD;
 
-        // Making the vision portal
-        VisionPortal myVisionPortal;
-
-        // Create a VisionPortal, with the specified camera and AprilTag processor, and assign it to a variable.
-        myVisionPortal = VisionPortal.easyCreateWithDefaults(hardwareMap.get(WebcamName.class, "Webcam"), myAprilTagProcessor);
-
-//        // Initializing the tensor flow processor
-//        TfodProcessor myTfodProcessor;
-//        // Create the TensorFlow Object Detection processor and assign it to a variable.
-//        myTfodProcessor = TfodProcessor.easyCreateWithDefaults();
-
-
+        RevHubOrientationOnRobot orientation = new RevHubOrientationOnRobot(logoDirection, usbDirection);
+        imu.initialize(new IMU.Parameters(orientation));
         waitForStart();
         double percent = 65;
         if (opModeIsActive()) {
-            //ArrayList<AprilTagDetection> aprilTags = myAprilTagProcessor.getDetections();
-            /*
-            Meta Data available from april tags
-            ID code
-            tag name
-            tag size
-            unit for tag size and estimated position
-             */
 
-            drive(-1, 0, 0, percent);
+            drive(1, 0, 0, percent);
             pause(1000);
             drive(0, 0, 0, percent);
-
+            double v = leftFront.getVelocity();
+            ElapsedTime runTime = new ElapsedTime();
+            double distance = 0.5*v*runTime.seconds();
+            telemetry.addData("Distance (Ticks)", distance);
+            telemetry.update();
+            pause(10000);
         }
     }
 
