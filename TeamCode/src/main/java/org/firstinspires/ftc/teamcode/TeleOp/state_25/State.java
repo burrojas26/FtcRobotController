@@ -5,9 +5,9 @@
 
 package org.firstinspires.ftc.teamcode.TeleOp.state_25;
 
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -15,8 +15,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.teamcode.RoadRunner.GoBildaPinpointDriver;
 
 @TeleOp(name="State Comp 2025", group="Linear OpMode")
@@ -27,11 +25,15 @@ public class State extends LinearOpMode {
     DcMotorEx leftFront, leftBack, rightFront, rightBack; // Drivetrain motors
     DcMotorEx leftArm, rightArm; // Arm motors
     Servo leftServo, rightServo; // Arm rotation servos
-    double percent; // Power percentage for driving
+    Servo pinch, rotator; // Intake servos
 
     // Localization and Arm control
     GoBildaPinpointDriver pinpoint;
     Arm arm;
+    Intake intake;
+
+    // Control Variables
+    double percent; // Power percentage for driving
 
     @Override
     public void runOpMode() {
@@ -48,6 +50,10 @@ public class State extends LinearOpMode {
         leftServo = hardwareMap.get(Servo.class, "leftServo");
         rightServo = hardwareMap.get(Servo.class, "rightServo");
 
+        // Initialize intake servos
+        pinch = hardwareMap.get(Servo.class, "pinch");
+        rotator = hardwareMap.get(Servo.class, "rotate");
+
         // Initialize GoBilda Pinpoint driver for localization
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
 
@@ -57,19 +63,31 @@ public class State extends LinearOpMode {
         leftBack.setDirection(DcMotorEx.Direction.FORWARD);
         rightBack.setDirection(DcMotorEx.Direction.FORWARD);
 
+        // Configure Arm motor directions
+        leftArm.setDirection(DcMotorSimple.Direction.REVERSE); //TODO
+        rightArm.setDirection(DcMotorSimple.Direction.FORWARD); //TODO
+
         // Configure the pinpoint localization system
         pinpoint.setOffsets(107.3, 0);
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_SWINGARM_POD);
         pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
         pinpoint.resetPosAndIMU();
 
+        // Reset encoders for the arm motors
+        leftArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
         waitForStart();
 
         // Declare control variables
         percent = 65; // Default power percentage
-        Gamepad oldGamepad1 = gamepad1;
-        Gamepad oldGamepad2 = gamepad2;
+        Gamepad oldGamepad1 = new Gamepad();
+        Gamepad oldGamepad2 = new Gamepad();
+        oldGamepad1.copy(gamepad1);
+        oldGamepad2.copy(gamepad2);
+        boolean manual = false; // Manual Mode for vertical slide
         boolean fieldCentric = false;
+
 
         while (opModeIsActive()) {
             // Update localization data
@@ -87,15 +105,26 @@ public class State extends LinearOpMode {
             double newX = strafe * Math.cos(robotHeading) + drive * Math.sin(robotHeading);
             double newY = -strafe * Math.sin(robotHeading) + drive * Math.cos(robotHeading);
 
-            // Initialize Arm control with gamepad2 inputs
+            // Initialize Arm control with hardware inputs
             arm = new Arm(leftArm, rightArm, leftServo, rightServo, gamepad2);
 
             // Arm control logic
-            if (gamepad2.right_stick_button && !oldGamepad2.right_stick_button) arm.manual();
+            if (gamepad2.right_stick_button && !oldGamepad2.right_stick_button) manual = !manual;
+            if (manual) arm.manual();
             if (gamepad2.y) arm.extendArm();
             if (gamepad2.a) arm.collapseArm();
             if (gamepad2.x) arm.stopArm();
             if (gamepad2.right_bumper) arm.resetEncode();
+            if (gamepad2.dpad_left) arm.armDown();
+            if (gamepad2.dpad_up) arm.armUp();
+            arm.rotateArm(gamepad2.left_stick_y);
+
+            // Initialize Intake control
+            intake = new Intake(pinch, rotator);
+
+            // Intake control logic
+            intake.pinch(gamepad2.right_trigger, gamepad2.left_trigger);
+            if (!manual) intake.rotate(gamepad2.right_stick_y);
 
             // Emergency stop triggered by back button
             if (gamepad1.back || gamepad2.back) stopAll();
@@ -125,23 +154,11 @@ public class State extends LinearOpMode {
             drive(x, y, rotate, percent);
 
             // Display telemetry data
-            telemetry.addLine("Robot Data");
-            telemetry.addData("Field Centric Mode", fieldCentric);
-            telemetry.addData("Robot Position (X axis in CM)", pinpoint.getPosition().getX(DistanceUnit.CM));
-            telemetry.addData("Robot Position (Y axis in CM)", pinpoint.getPosition().getY(DistanceUnit.CM));
-            telemetry.addData("Robot Position (H axis in Degrees)", pinpoint.getPosition().getHeading(AngleUnit.DEGREES));
-            telemetry.addLine("\nDrive Data");
-            telemetry.addData("Percent Power", percent);
-            telemetry.addData("Left Front Power", leftFront.getPower());
-            telemetry.addData("Right Front Power", rightFront.getPower());
-            telemetry.addData("Left Back Power", leftBack.getPower());
-            telemetry.addData("Right Back Power", rightBack.getPower());
-
-            telemetry.update();
+            updateTelemetry(fieldCentric, manual);
 
             // Update the old gamepad settings
-            oldGamepad1 = gamepad1;
-            oldGamepad2 = gamepad2;
+            oldGamepad1.copy(gamepad1);
+            oldGamepad2.copy(gamepad2);
         } // End while loop
     } // End runOpMode
 
@@ -163,24 +180,40 @@ public class State extends LinearOpMode {
      * @param percent Power percentage to scale movement
      */
     public void drive(double drive, double strafe, double rotate, double percent) {
-        // Compute individual motor powers based on drive vectors
-        double frontLeftPower = drive + strafe + rotate;
-        double frontRightPower = -drive + strafe + rotate;
-        double backLeftPower = -drive + strafe - rotate;
-        double backRightPower = drive + strafe - rotate;
+        double scale = percent / 100;
+        leftFront.setPower(scale * (drive + strafe + rotate));
+        rightFront.setPower(scale * (-drive + strafe + rotate));
+        leftBack.setPower(scale * (-drive + strafe - rotate));
+        rightBack.setPower(scale * (drive + strafe - rotate));
+    }
 
-        // Scale motor power by percentage unless overridden
-        if (!gamepad1.left_bumper) {
-            frontLeftPower *= percent / 100;
-            frontRightPower *= percent / 100;
-            backLeftPower *= percent / 100;
-            backRightPower *= percent / 100;
-        }
-
-        // Set motor power values
-        leftFront.setPower(frontLeftPower);
-        rightFront.setPower(frontRightPower);
-        leftBack.setPower(backLeftPower);
-        rightBack.setPower(backRightPower);
+    /**
+     * Updates all telemetry data
+     *
+     * @param fieldCentric boolean for field centric mode
+     * @param manual boolean for manual control of the arm
+     */
+    public void updateTelemetry(boolean fieldCentric, boolean manual) {
+        telemetry.addLine("Robot Data");
+        telemetry.addData("Field Centric Mode", fieldCentric);
+        telemetry.addData("Robot Position (X axis in CM)", pinpoint.getPosition().getX(DistanceUnit.CM));
+        telemetry.addData("Robot Position (Y axis in CM)", pinpoint.getPosition().getY(DistanceUnit.CM));
+        telemetry.addData("Robot Position (H axis in Degrees)", pinpoint.getPosition().getHeading(AngleUnit.DEGREES));
+        telemetry.addLine("\nDrive Data");
+        telemetry.addData("Percent Power", percent);
+        telemetry.addData("Left Front Power", leftFront.getPower());
+        telemetry.addData("Right Front Power", rightFront.getPower());
+        telemetry.addData("Left Back Power", leftBack.getPower());
+        telemetry.addData("Right Back Power", rightBack.getPower());
+        telemetry.addLine("Arm Data");
+        telemetry.addData("Manual", manual);
+        telemetry.addData("Left Motor", leftArm.getCurrentPosition());
+        telemetry.addData("Right Motor", rightArm.getCurrentPosition());
+        telemetry.addData("Left Servo", leftServo.getPosition());
+        telemetry.addData("Right Servo", rightServo.getPosition());
+        telemetry.addLine("Intake Data");
+        telemetry.addData("Pinch Position", pinch.getPosition());
+        telemetry.addData("Rotate Position", rotator.getPosition());
+        telemetry.update();
     }
 }

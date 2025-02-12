@@ -26,9 +26,10 @@ public class Arm {
     Gamepad gamepad2;
 
     // Limits for servo rotation and extension
-    double servoMax = 0.9; // Maximum servo position (to be defined)
-    double servoMin = 0.45; // Minimum servo position (to be defined)
-    int extensionMax = 0; // Maximum extension position (to be defined)
+    double servoMax = 0.72; // Maximum servo position
+    double servoMin = 0.27; // Minimum servo position
+    int extensionMax = 2625; // Maximum extension position
+    int extSpeed = 4000; // Arm extension speed
 
     /**
      * Constructor to initialize the Arm with motors, servos, and a gamepad.
@@ -60,6 +61,16 @@ public class Arm {
             leftServo.setPosition(newPos);
             rightServo.setPosition(newPos);
         }
+    }
+
+    public void armUp() {
+        leftServo.setPosition(0.5);
+        rightServo.setPosition(0.5);
+    }
+
+    public void armDown() {
+        leftServo.setPosition(servoMax);
+        rightServo.setPosition(servoMax);
     }
 
     /**
@@ -106,14 +117,14 @@ public class Arm {
     public void manual() {
         float increase = gamepad2.right_stick_y * 500; // Convert joystick movement to motor steps
         int newPos = leftMotor.getCurrentPosition() + (int) increase;
-        //if (newPos < extensionMax && newPos > 0) { // Ensure within limits
+        if (newPos < extensionMax && newPos > 0) { // Ensure within limits
             leftMotor.setTargetPosition(newPos);
             leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             rightMotor.setTargetPosition(newPos);
             rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            leftMotor.setVelocity(4000);
-            rightMotor.setVelocity(4000);
-        //}
+            leftMotor.setVelocity(extSpeed);
+            rightMotor.setVelocity(extSpeed);
+        }
     }
 
     /**
