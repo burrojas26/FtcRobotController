@@ -23,11 +23,11 @@ public class Arm {
     Servo rightServo;
 
     // Gamepad for manual control
-    Gamepad gamepad;
+    Gamepad gamepad2;
 
     // Limits for servo rotation and extension
-    double servoMax = 0; // Maximum servo position (to be defined)
-    double servoMin = 0; // Minimum servo position (to be defined)
+    double servoMax = 0.9; // Maximum servo position (to be defined)
+    double servoMin = 0.45; // Minimum servo position (to be defined)
     int extensionMax = 0; // Maximum extension position (to be defined)
 
     /**
@@ -44,7 +44,7 @@ public class Arm {
         this.rightMotor = rightMotor;
         this.leftServo = leftServo;
         this.rightServo = rightServo;
-        this.gamepad = gamepad;
+        this.gamepad2 = gamepad;
     }
 
     /**
@@ -54,7 +54,7 @@ public class Arm {
      * @param joyStick The joystick input value for rotation (-1 to 1).
      */
     public void rotateArm(double joyStick) {
-        double newPos = leftServo.getPosition() + joyStick * 0.05;
+        double newPos = leftServo.getPosition() + joyStick * 0.0005;
         leftServo.setDirection(Servo.Direction.REVERSE); // Ensuring one servo moves in reverse
         if (newPos < servoMax && newPos > servoMin) { // Ensuring the position is within bounds
             leftServo.setPosition(newPos);
@@ -104,16 +104,16 @@ public class Arm {
      * The right stick's Y-axis adjusts the motor position within safe limits.
      */
     public void manual() {
-        float increase = gamepad.right_stick_y * 500; // Convert joystick movement to motor steps
+        float increase = gamepad2.right_stick_y * 500; // Convert joystick movement to motor steps
         int newPos = leftMotor.getCurrentPosition() + (int) increase;
-        if (newPos < extensionMax && newPos > 0) { // Ensure within limits
+        //if (newPos < extensionMax && newPos > 0) { // Ensure within limits
             leftMotor.setTargetPosition(newPos);
             leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             rightMotor.setTargetPosition(newPos);
             rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             leftMotor.setVelocity(4000);
             rightMotor.setVelocity(4000);
-        }
+        //}
     }
 
     /**
