@@ -18,7 +18,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.teamcode.RoadRunner.GoBildaPinpointDriver;
 
-@TeleOp
+@TeleOp(name="State Comp 2025", group="Linear OpMode")
 public class State extends LinearOpMode {
     //Variables
     Orientation angles;

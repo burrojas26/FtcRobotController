@@ -7,6 +7,7 @@
 
 package org.firstinspires.ftc.teamcode.TeleOp.qualifier_25;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -19,6 +20,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
 @TeleOp
+@Disabled
 public class Qualifier_2025 extends LinearOpMode {
     //Variables
     IMU imu;
