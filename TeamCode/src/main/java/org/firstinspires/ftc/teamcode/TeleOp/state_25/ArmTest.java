@@ -44,8 +44,8 @@ public class ArmTest extends LinearOpMode {
         leftArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-
-
+        leftServo.setPosition(0.5);
+        leftServo.setPosition(0.5);
 
         while (opModeIsActive()) {
             // Initialize Arm control with gamepad2 inputs
