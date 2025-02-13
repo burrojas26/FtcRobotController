@@ -115,7 +115,7 @@ public class Arm {
      * The right stick's Y-axis adjusts the motor position within safe limits.
      */
     public void manual() {
-        float increase = gamepad2.right_stick_y * 500; // Convert joystick movement to motor steps
+        float increase = -gamepad2.right_stick_y * 500; // Convert joystick movement to motor steps
         int newPos = leftMotor.getCurrentPosition() + (int) increase;
         if (newPos < extensionMax && newPos > 0) { // Ensure within limits
             leftMotor.setTargetPosition(newPos);

@@ -3,16 +3,15 @@
  * Test for the arm servos and motors
  */
 
-package org.firstinspires.ftc.teamcode.Tests;
+package org.firstinspires.ftc.teamcode.TeleOp.state_25;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
-
-import org.firstinspires.ftc.teamcode.TeleOp.state_25.Arm;
 
 @TeleOp(name="Arm Test", group="Linear OpMode")
 public class ArmTest extends LinearOpMode {
@@ -39,17 +38,22 @@ public class ArmTest extends LinearOpMode {
         Gamepad oldGamepad2 = new Gamepad();
         oldGamepad2.copy(gamepad2);
         boolean manual = false;
+        boolean oldBtn = false;
 
 
         leftArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+
+
 
         while (opModeIsActive()) {
             // Initialize Arm control with gamepad2 inputs
             arm = new Arm(leftArm, rightArm, leftServo, rightServo, gamepad2);
 
             // Arm control logic
-            if (gamepad2.right_stick_button && !oldGamepad2.right_stick_button) manual = !manual;
+            if (gamepad2.right_stick_button && oldBtn) manual = !manual;
+            oldBtn = gamepad2.right_stick_button;
             if (manual) arm.manual();
             if (gamepad2.y) arm.extendArm();
             if (gamepad2.a) arm.collapseArm();
@@ -63,6 +67,8 @@ public class ArmTest extends LinearOpMode {
             if (gamepad1.back || gamepad2.back) stopAll();
 
             telemetry.addData("Manual", manual);
+            telemetry.addData("Left Arm", leftArm.getCurrentPosition());
+            telemetry.addData("Right Arm", rightArm.getCurrentPosition());
             telemetry.addData("Left Motor", leftArm.getCurrentPosition());
             telemetry.addData("Right Motor", rightArm.getCurrentPosition());
             telemetry.addData("Left Servo", leftServo.getPosition());
