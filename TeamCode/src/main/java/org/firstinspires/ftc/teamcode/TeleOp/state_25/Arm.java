@@ -63,11 +63,17 @@ public class Arm {
         }
     }
 
+    /**
+     * Rotates the arm up, 90 degrees from forward position
+     */
     public void armUp() {
         leftServo.setPosition(0.5);
         rightServo.setPosition(0.5);
     }
 
+    /**
+     * Rotates the arm so it points straight forward "forward position"
+     */
     public void armDown() {
         leftServo.setPosition(servoMax);
         rightServo.setPosition(servoMax);
