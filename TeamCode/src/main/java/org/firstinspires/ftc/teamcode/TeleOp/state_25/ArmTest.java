@@ -44,6 +44,8 @@ public class ArmTest extends LinearOpMode {
         leftArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
+        leftArm.setDirection(DcMotorEx.Direction.REVERSE);
+
         leftServo.setPosition(0.5);
         leftServo.setPosition(0.5);
 
