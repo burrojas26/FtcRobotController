@@ -46,8 +46,6 @@ public class ArmTest extends LinearOpMode {
 
         leftArm.setDirection(DcMotorEx.Direction.REVERSE);
 
-        leftServo.setPosition(0.5);
-        leftServo.setPosition(0.5);
 
         while (opModeIsActive()) {
             // Initialize Arm control with gamepad2 inputs
