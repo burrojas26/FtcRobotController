@@ -31,6 +31,7 @@ public class State extends LinearOpMode {
     GoBildaPinpointDriver pinpoint;
     Arm arm;
     Intake intake;
+    Auto auto;
 
     // Control Variables
     double percent; // Power percentage for driving
@@ -69,6 +70,9 @@ public class State extends LinearOpMode {
 
         // Configure other servo
         rotator.setDirection(Servo.Direction.REVERSE);
+
+        // Ensuring one Arm servo moves in reverse
+        leftServo.setDirection(Servo.Direction.REVERSE);
 
         // Configure the pinpoint localization system
         pinpoint.setOffsets(107.3, 0);
@@ -126,7 +130,6 @@ public class State extends LinearOpMode {
             if (gamepad2.a) arm.collapseArm();
             if (gamepad2.x) arm.stopArm();
             if (gamepad2.right_bumper) arm.resetEncode();
-            if (gamepad2.dpad_left) arm.armDown();
             if (gamepad2.dpad_up) arm.armUp();
             arm.rotateArm(gamepad2.left_stick_y);
 
@@ -136,6 +139,14 @@ public class State extends LinearOpMode {
             // Intake control logic
             intake.pinch(gamepad2.right_trigger, gamepad2.left_trigger);
             if (!manual) intake.rotate(gamepad2.right_stick_y);
+
+            // Initialize Auto control
+            auto = new Auto(arm, intake);
+
+            // Auto Controlled logic
+            if (gamepad2.dpad_right) auto.readyPickup();
+            if (gamepad2.dpad_down) intake.close();
+            if (gamepad2.dpad_left) auto.getFromWall();
 
             // Emergency stop triggered by back button
             if (gamepad1.back || gamepad2.back) stopAll();
@@ -180,6 +191,7 @@ public class State extends LinearOpMode {
     public void stopAll() {
         percent = 0;
         arm.stopArm();
+        intake.stopIntake();
     }
 
     /**

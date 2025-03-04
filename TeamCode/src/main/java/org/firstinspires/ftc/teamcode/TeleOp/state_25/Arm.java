@@ -56,7 +56,10 @@ public class Arm {
      */
     public void rotateArm(double joyStick) {
         double newPos = leftServo.getPosition() + joyStick * 0.003;
-        leftServo.setDirection(Servo.Direction.REVERSE); // Ensuring one servo moves in reverse
+        rotateToPos(newPos);
+    }
+
+    public void rotateToPos(double newPos) {
         if (newPos < servoMax && newPos > servoMin) { // Ensuring the position is within bounds
             leftServo.setPosition(newPos);
             rightServo.setPosition(newPos);
@@ -78,12 +81,18 @@ public class Arm {
      * Sets both motors to move to the pre-defined extension limit.
      */
     public void extendArm() {
-        leftMotor.setTargetPosition(extensionMax);
-        leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightMotor.setTargetPosition(extensionMax);
-        rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        leftMotor.setVelocity(4000); // Set velocity for smooth movement
-        rightMotor.setVelocity(4000);
+        setArmPos(extensionMax);
+    }
+
+    public void setArmPos(int newPos) {
+        if (newPos <= extensionMax && newPos >= 0) {
+            leftMotor.setTargetPosition(newPos);
+            leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            rightMotor.setTargetPosition(newPos);
+            rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            leftMotor.setVelocity(4000); // Set velocity for smooth movement
+            rightMotor.setVelocity(4000);
+        }
     }
 
     /**

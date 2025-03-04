@@ -39,9 +39,22 @@ public class Intake {
      */
     public void pinch(float triggerPos, float triggerNeg) {
         double newPos = pinch.getPosition() + (triggerPos-triggerNeg)*0.008;
+        pinchToPos(newPos);
+    }
+
+    public void pinchToPos(double newPos) {
         if (newPos < pinchMax && newPos > pinchMin) {
             pinch.setPosition(newPos);
         }
+    }
+
+    public void open() {
+        pinchToPos(pinchMax);
+    }
+
+    public void close() {
+        double closePos = 0; //TODO
+        pinchToPos(closePos);
     }
 
     /**
@@ -51,8 +64,20 @@ public class Intake {
      */
     public void rotate(double joyStick) {
         double newPos = rotate.getPosition() + joyStick*0.005;
+        rotateToPos(newPos);
+    }
+
+    public void rotateToPos(double newPos) {
         if (newPos < rotateMax && newPos > rotateMin) {
             rotate.setPosition(newPos);
         }
+    }
+
+    /**
+     * Function to stop all moving parts
+     */
+    public void stopIntake() {
+        pinch.setPosition(pinch.getPosition());
+        rotate.setPosition(rotate.getPosition());
     }
 }
