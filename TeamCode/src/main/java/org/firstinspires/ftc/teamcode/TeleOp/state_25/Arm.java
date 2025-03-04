@@ -55,7 +55,7 @@ public class Arm {
      * @param joyStick The joystick input value for rotation (-1 to 1).
      */
     public void rotateArm(double joyStick) {
-        double newPos = leftServo.getPosition() + joyStick * 0.0005;
+        double newPos = leftServo.getPosition() + joyStick * 0.003;
         leftServo.setDirection(Servo.Direction.REVERSE); // Ensuring one servo moves in reverse
         if (newPos < servoMax && newPos > servoMin) { // Ensuring the position is within bounds
             leftServo.setPosition(newPos);

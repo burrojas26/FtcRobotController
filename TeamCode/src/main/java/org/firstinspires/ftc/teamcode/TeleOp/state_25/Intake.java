@@ -15,10 +15,10 @@ public class Intake {
     Servo pinch, rotate;
 
     // Software limits for servos
-    double pinchMax = 0; //TODO
-    double pinchMin = 0; //TODO
-    double rotateMax = 0; //TODO
-    double rotateMin = 0; //TODO
+    double pinchMax = 0.3;
+    double pinchMin = 0;
+    double rotateMax = 0.5;
+    double rotateMin = 0.4;
 
     /**
      * Constructor to initialize the intake with 2 servos
@@ -38,7 +38,7 @@ public class Intake {
      * @param triggerNeg The trigger value to use as counter clockwise rotation
      */
     public void pinch(float triggerPos, float triggerNeg) {
-        double newPos = pinch.getPosition() + (triggerPos-triggerNeg)*0.005;
+        double newPos = pinch.getPosition() + (triggerPos-triggerNeg)*0.008;
         if (newPos < pinchMax && newPos > pinchMin) {
             pinch.setPosition(newPos);
         }

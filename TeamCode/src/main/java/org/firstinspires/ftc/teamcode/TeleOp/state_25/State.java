@@ -67,9 +67,8 @@ public class State extends LinearOpMode {
         leftArm.setDirection(DcMotorSimple.Direction.FORWARD);
         rightArm.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        // Set rotation of arm
-        leftServo.setPosition(0.5);
-        rightServo.setPosition(0.5);
+        // Configure other servo
+        rotator.setDirection(Servo.Direction.REVERSE);
 
         // Configure the pinpoint localization system
         pinpoint.setOffsets(107.3, 0);
@@ -82,6 +81,14 @@ public class State extends LinearOpMode {
         rightArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         waitForStart();
+
+        // Set rotation of arm
+        leftServo.setPosition(0.52);
+        rightServo.setPosition(0.52);
+
+        // Set intake starting positions
+        pinch.setPosition(0);
+        rotator.setPosition(.45);
 
         // Declare control variables
         percent = 65; // Default power percentage
