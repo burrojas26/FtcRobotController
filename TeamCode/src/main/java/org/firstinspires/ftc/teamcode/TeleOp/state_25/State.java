@@ -64,8 +64,12 @@ public class State extends LinearOpMode {
         rightBack.setDirection(DcMotorEx.Direction.FORWARD);
 
         // Configure Arm motor directions
-        leftArm.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightArm.setDirection(DcMotorSimple.Direction.FORWARD);
+        leftArm.setDirection(DcMotorSimple.Direction.FORWARD);
+        rightArm.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        // Set rotation of arm
+        leftServo.setPosition(0.5);
+        rightServo.setPosition(0.5);
 
         // Configure the pinpoint localization system
         pinpoint.setOffsets(107.3, 0);
