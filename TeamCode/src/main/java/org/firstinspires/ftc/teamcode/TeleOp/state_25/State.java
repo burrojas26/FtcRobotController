@@ -35,6 +35,7 @@ public class State extends LinearOpMode {
 
     // Control Variables
     double percent; // Power percentage for driving
+    boolean stopped = false;
 
     @Override
     public void runOpMode() {
@@ -104,6 +105,7 @@ public class State extends LinearOpMode {
         boolean fieldCentric = false;
 
 
+
         while (opModeIsActive()) {
             // Update localization data
             pinpoint.update();
@@ -126,9 +128,11 @@ public class State extends LinearOpMode {
             // Arm control logic
             if (gamepad2.right_stick_button && !oldGamepad2.right_stick_button) manual = !manual;
             if (manual) arm.manual();
-            if (gamepad2.y) arm.extendArm();
-            if (gamepad2.a) arm.collapseArm();
-            if (gamepad2.x) arm.stopArm();
+            if (!manual) {
+                if (gamepad2.y) arm.extendArm();
+                if (gamepad2.a) arm.collapseArm();
+                if (gamepad2.x) arm.stopArm();
+            }
             if (gamepad2.right_bumper) arm.resetEncode();
             if (gamepad2.dpad_up) arm.armUp();
             arm.rotateArm(gamepad2.left_stick_y);
@@ -144,9 +148,10 @@ public class State extends LinearOpMode {
             auto = new Auto(arm, intake);
 
             // Auto Controlled logic
-            if (gamepad2.dpad_right) auto.readyPickup();
-            if (gamepad2.dpad_down) intake.close();
+            if (gamepad2.dpad_down) auto.readyPickup();
+            if (gamepad2.b) intake.close();
             if (gamepad2.dpad_left) auto.getFromWall();
+            if (gamepad2.dpad_right) auto.scoreSample();
 
             // Emergency stop triggered by back button
             if (gamepad1.back || gamepad2.back) stopAll();
@@ -192,6 +197,8 @@ public class State extends LinearOpMode {
         percent = 0;
         arm.stopArm();
         intake.stopIntake();
+        auto.stopAll();
+        stopped = true;
     }
 
     /**
@@ -228,15 +235,16 @@ public class State extends LinearOpMode {
         telemetry.addData("Right Front Power", rightFront.getPower());
         telemetry.addData("Left Back Power", leftBack.getPower());
         telemetry.addData("Right Back Power", rightBack.getPower());
-        telemetry.addLine("Arm Data");
+        telemetry.addLine("\nArm Data");
         telemetry.addData("Manual", manual);
         telemetry.addData("Left Motor", leftArm.getCurrentPosition());
         telemetry.addData("Right Motor", rightArm.getCurrentPosition());
         telemetry.addData("Left Servo", leftServo.getPosition());
         telemetry.addData("Right Servo", rightServo.getPosition());
-        telemetry.addLine("Intake Data");
+        telemetry.addLine("\nIntake Data");
         telemetry.addData("Pinch Position", pinch.getPosition());
         telemetry.addData("Rotate Position", rotator.getPosition());
+        telemetry.addData("Stopped", stopped);
         telemetry.update();
     }
 }

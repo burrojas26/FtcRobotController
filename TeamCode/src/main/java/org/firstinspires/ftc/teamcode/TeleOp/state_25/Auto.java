@@ -9,6 +9,9 @@ public class Auto {
     Arm arm;
     Intake intake;
 
+    scoreFn runnable = new scoreFn();
+    Thread thread = new Thread(runnable);
+
     boolean stopped = false;
 
     /**
@@ -37,6 +40,39 @@ public class Auto {
     public void readyPickup() {
         intake.rotateToPos(intake.rotateMax);
         intake.open();
+    }
+
+    class scoreFn implements Runnable {
+        @Override
+        public void run() {
+                int scoreExt = 1300; //TODO
+                int scoreExt2 = 800; //TODO
+                double scoreRotPos = 0.7; //TODO
+                double scoreRotPos2 = 0.65; //TODO
+                double scoreWristPos = 0; //TODO
+                intake.rotateToPos(scoreWristPos);
+                pause(500);
+                arm.rotateToPos(scoreRotPos);
+                pause(500);
+                arm.setArmPos(scoreExt);
+                pause(600);
+                arm.rotateToPos(scoreRotPos2);
+                pause(500);
+                arm.setArmPos(scoreExt2);
+        }
+    }
+
+    public void scoreSample() {
+        thread.start();
+    }
+
+    public void pause(long time) {
+        try {
+            // Sleep for 2 seconds (2000 milliseconds)
+            Thread.sleep(time);
+        } catch (InterruptedException e) {
+            System.out.println("Thread was interrupted!");
+        }
     }
 
     public void stopAll() {

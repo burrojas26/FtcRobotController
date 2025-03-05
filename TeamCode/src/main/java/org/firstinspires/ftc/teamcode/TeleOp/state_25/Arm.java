@@ -26,7 +26,7 @@ public class Arm {
     Gamepad gamepad2;
 
     // Limits for servo rotation and extension
-    double servoMax = 0.72; // Maximum servo position
+    double servoMax = 0.78; // Maximum servo position
     double servoMin = 0.27; // Minimum servo position
     int extensionMax = 2625; // Maximum extension position
     int extSpeed = 4000; // Arm extension speed
@@ -55,7 +55,7 @@ public class Arm {
      * @param joyStick The joystick input value for rotation (-1 to 1).
      */
     public void rotateArm(double joyStick) {
-        double newPos = leftServo.getPosition() + joyStick * 0.003;
+        double newPos = leftServo.getPosition() + -joyStick * 0.003;
         rotateToPos(newPos);
     }
 
