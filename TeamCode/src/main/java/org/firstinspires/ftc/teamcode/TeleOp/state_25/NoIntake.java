@@ -17,21 +17,18 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.RoadRunner.GoBildaPinpointDriver;
 
-@TeleOp(name="State Comp 2025", group="Linear OpMode")
-public class State extends LinearOpMode {
+@TeleOp(name="No Intake", group="Linear OpMode")
+public class NoIntake extends LinearOpMode {
 
     // Robot hardware variables
     Orientation angles;
     DcMotorEx leftFront, leftBack, rightFront, rightBack; // Drivetrain motors
     DcMotorEx leftArm, rightArm; // Arm motors
     Servo leftServo, rightServo; // Arm rotation servos
-    Servo pinch, rotator; // Intake servos
 
     // Localization and Arm control
     GoBildaPinpointDriver pinpoint;
     Arm arm;
-    Intake intake;
-    Auto auto;
 
     // Control Variables
     double percent; // Power percentage for driving
@@ -51,10 +48,6 @@ public class State extends LinearOpMode {
         leftServo = hardwareMap.get(Servo.class, "leftServo");
         rightServo = hardwareMap.get(Servo.class, "rightServo");
 
-        // Initialize intake servos
-        pinch = hardwareMap.get(Servo.class, "pinch");
-        rotator = hardwareMap.get(Servo.class, "rotate");
-
         // Initialize GoBilda Pinpoint driver for localization
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
 
@@ -65,14 +58,8 @@ public class State extends LinearOpMode {
         rightBack.setDirection(DcMotorEx.Direction.FORWARD);
 
         // Configure Arm motor directions
-        leftArm.setDirection(DcMotorSimple.Direction.FORWARD);
-        rightArm.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        // Configure other servo
-        rotator.setDirection(Servo.Direction.REVERSE);
-
-        // Ensuring one Arm servo moves in reverse
-        leftServo.setDirection(Servo.Direction.REVERSE);
+        leftArm.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightArm.setDirection(DcMotorSimple.Direction.FORWARD);
 
         // Configure the pinpoint localization system
         pinpoint.setOffsets(107.3, 0);
@@ -85,14 +72,6 @@ public class State extends LinearOpMode {
         rightArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         waitForStart();
-
-        // Set rotation of arm
-        leftServo.setPosition(0.5);
-        rightServo.setPosition(0.5);
-
-        // Set intake starting positions
-        pinch.setPosition(0);
-        rotator.setPosition(.45);
 
         // Declare control variables
         percent = 65; // Default power percentage
@@ -130,23 +109,9 @@ public class State extends LinearOpMode {
             if (gamepad2.a) arm.collapseArm();
             if (gamepad2.x) arm.stopArm();
             if (gamepad2.right_bumper) arm.resetEncode();
+            if (gamepad2.dpad_left) arm.armDown();
             if (gamepad2.dpad_up) arm.armUp();
             arm.rotateArm(gamepad2.left_stick_y);
-
-            // Initialize Intake control
-            intake = new Intake(pinch, rotator);
-
-            // Intake control logic
-            intake.pinch(gamepad2.right_trigger, gamepad2.left_trigger);
-            if (!manual) intake.rotate(gamepad2.right_stick_y);
-
-            // Initialize Auto control
-            auto = new Auto(arm, intake);
-
-            // Auto Controlled logic
-            if (gamepad2.dpad_right) auto.readyPickup();
-            if (gamepad2.dpad_down) intake.close();
-            if (gamepad2.dpad_left) auto.getFromWall();
 
             // Emergency stop triggered by back button
             if (gamepad1.back || gamepad2.back) stopAll();
@@ -173,7 +138,7 @@ public class State extends LinearOpMode {
             double y = fieldCentric ? newY : drive;
 
             // Execute driving function
-            drive(y, x, rotate, percent);
+            drive(x, y, rotate, percent);
 
             // Display telemetry data
             updateTelemetry(fieldCentric, manual);
@@ -191,7 +156,6 @@ public class State extends LinearOpMode {
     public void stopAll() {
         percent = 0;
         arm.stopArm();
-        intake.stopIntake();
     }
 
     /**
@@ -234,9 +198,6 @@ public class State extends LinearOpMode {
         telemetry.addData("Right Motor", rightArm.getCurrentPosition());
         telemetry.addData("Left Servo", leftServo.getPosition());
         telemetry.addData("Right Servo", rightServo.getPosition());
-        telemetry.addLine("Intake Data");
-        telemetry.addData("Pinch Position", pinch.getPosition());
-        telemetry.addData("Rotate Position", rotator.getPosition());
         telemetry.update();
     }
 }
