@@ -104,7 +104,7 @@ public class State extends LinearOpMode {
         boolean manual = false; // Manual Mode for vertical slide
         boolean fieldCentric = false;
         boolean btnB = false;
-
+        boolean rtStickBtn = false;
 
 
         while (opModeIsActive()) {
@@ -127,7 +127,8 @@ public class State extends LinearOpMode {
             arm = new Arm(leftArm, rightArm, leftServo, rightServo, gamepad2);
 
             // Arm control logic
-            if (gamepad2.right_stick_button && !oldGamepad2.right_stick_button) manual = !manual;
+            if (gamepad2.right_stick_button && !rtStickBtn) manual = !manual;
+            rtStickBtn = gamepad2.right_stick_button;
             if (manual) arm.manual();
             if (!manual) {
                 if (gamepad2.y) arm.extendArm();

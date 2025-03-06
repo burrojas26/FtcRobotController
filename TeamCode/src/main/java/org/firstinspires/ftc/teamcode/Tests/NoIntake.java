@@ -3,7 +3,7 @@
  * This is the final program for the teleop period in the 2024-25 state competition (Into the Deep).
  */
 
-package org.firstinspires.ftc.teamcode.TeleOp.state_25;
+package org.firstinspires.ftc.teamcode.Tests;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -16,6 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.RoadRunner.GoBildaPinpointDriver;
+import org.firstinspires.ftc.teamcode.TeleOp.state_25.Arm;
 
 @TeleOp(name="No Intake", group="Linear OpMode")
 public class NoIntake extends LinearOpMode {
