@@ -17,8 +17,8 @@ public class Intake {
     // Software limits for servos
     double pinchMax = 0.3;
     double pinchMin = 0;
-    double rotateMax = 0.5;
-    double rotateMin = 0.4;
+    double rotateMax = 0.28;
+    double rotateMin = 0.17;
 
     /**
      * Constructor to initialize the intake with 2 servos
@@ -43,7 +43,7 @@ public class Intake {
     }
 
     public void pinchToPos(double newPos) {
-        if (newPos < pinchMax && newPos > pinchMin) {
+        if (newPos <= pinchMax && newPos >= pinchMin) {
             pinch.setPosition(newPos);
         }
     }
@@ -53,7 +53,7 @@ public class Intake {
     }
 
     public void close() {
-        double closePos = 0; //TODO
+        double closePos = 0;
         pinchToPos(closePos);
     }
 

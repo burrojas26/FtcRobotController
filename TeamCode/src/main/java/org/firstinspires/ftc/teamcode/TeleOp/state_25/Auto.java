@@ -38,8 +38,11 @@ public class Auto {
     }
 
     public void readyPickup() {
-        intake.rotateToPos(intake.rotateMax);
+        double wristPos = 0.2633;
+        double rotPos = 0.2633;
+        intake.rotateToPos(wristPos);
         intake.open();
+        arm.rotateToPos(rotPos);
     }
 
     class scoreFn implements Runnable {

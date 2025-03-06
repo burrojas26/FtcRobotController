@@ -93,7 +93,7 @@ public class State extends LinearOpMode {
 
         // Set intake starting positions
         pinch.setPosition(0);
-        rotator.setPosition(.45);
+        rotator.setPosition(.2);
 
         // Declare control variables
         percent = 65; // Default power percentage
