@@ -103,6 +103,7 @@ public class State extends LinearOpMode {
         oldGamepad2.copy(gamepad2);
         boolean manual = false; // Manual Mode for vertical slide
         boolean fieldCentric = false;
+        boolean btnB = false;
 
 
 
@@ -135,21 +136,29 @@ public class State extends LinearOpMode {
             }
             if (gamepad2.right_bumper) arm.resetEncode();
             if (gamepad2.dpad_up) arm.armUp();
-            arm.rotateArm(gamepad2.left_stick_y);
+            if (!gamepad2.left_bumper) arm.rotateArm(gamepad2.left_stick_y);
 
             // Initialize Intake control
             intake = new Intake(pinch, rotator);
 
             // Intake control logic
             intake.pinch(gamepad2.right_trigger, gamepad2.left_trigger);
-            if (!manual) intake.rotate(gamepad2.right_stick_y);
+            if (!manual && !gamepad2.left_bumper) intake.rotate(gamepad2.right_stick_y);
 
             // Initialize Auto control
             auto = new Auto(arm, intake);
 
             // Auto Controlled logic
             if (gamepad2.dpad_down) auto.readyPickup();
-            if (gamepad2.b) intake.close();
+            if (gamepad2.b && !btnB) {
+                if (pinch.getPosition() <= 0.02) {
+                    intake.open();
+                }
+                else {
+                    intake.close();
+                }
+            }
+            btnB = gamepad2.b;
             if (gamepad2.dpad_left) auto.getFromWall();
             if (gamepad2.dpad_right) auto.scoreSample();
 

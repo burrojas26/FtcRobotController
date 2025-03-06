@@ -60,7 +60,7 @@ public class Arm {
     }
 
     public void rotateToPos(double newPos) {
-        if (newPos < servoMax && newPos > servoMin) { // Ensuring the position is within bounds
+    if (newPos <= servoMax && newPos >= servoMin) { // Ensuring the position is within bounds
             leftServo.setPosition(newPos);
             rightServo.setPosition(newPos);
         }

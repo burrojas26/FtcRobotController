@@ -9,8 +9,14 @@ public class Auto {
     Arm arm;
     Intake intake;
 
-    scoreFn runnable = new scoreFn();
-    Thread thread = new Thread(runnable);
+    scoreFn scorer = new scoreFn();
+    Thread scoreThread = new Thread(scorer);
+
+    readyFn ready = new readyFn();
+    Thread readyThread = new Thread(ready);
+
+    fromWallFn fromWall = new fromWallFn();
+    Thread wallThread = new Thread(fromWall);
 
     boolean stopped = false;
 
@@ -25,48 +31,56 @@ public class Auto {
         this.intake = intake;
     }
 
-    public void getFromWall() {
-        double armPos = 0; //TODO
-        int extPos = 0; //TODO
-        double rotPos = 0; //TODO
-        while (!stopped) {
+    class fromWallFn implements Runnable {
+        @Override
+        public void run() {
+            double armPos = 0.7361;
+            double rotPos = 0.2072;
+            double pinchPos = 0.1972;
             arm.rotateToPos(armPos);
-            arm.setArmPos(extPos);
             intake.rotateToPos(rotPos);
+            intake.pinchToPos(pinchPos);
+        }
+    }
+
+    public void getFromWall() {
+        wallThread.start();
+    }
+
+    class readyFn implements Runnable {
+        @Override
+        public void run() {
+            double wristPos = 0.2633;
+            double rotPos = 0.76;
+            intake.rotateToPos(wristPos);
             intake.open();
+            arm.rotateToPos(rotPos);
         }
     }
 
     public void readyPickup() {
-        double wristPos = 0.2633;
-        double rotPos = 0.2633;
-        intake.rotateToPos(wristPos);
-        intake.open();
-        arm.rotateToPos(rotPos);
+        readyThread.start();
     }
 
     class scoreFn implements Runnable {
         @Override
         public void run() {
-                int scoreExt = 1300; //TODO
-                int scoreExt2 = 800; //TODO
-                double scoreRotPos = 0.7; //TODO
-                double scoreRotPos2 = 0.65; //TODO
-                double scoreWristPos = 0; //TODO
+                int scoreExt = 1230;
+                int scoreExt2 = 422;
+                double scoreRotPos = 0.5889;
+                double scoreWristPos = 0.2689;
                 intake.rotateToPos(scoreWristPos);
-                pause(500);
-                arm.rotateToPos(scoreRotPos);
                 pause(500);
                 arm.setArmPos(scoreExt);
                 pause(600);
-                arm.rotateToPos(scoreRotPos2);
+                arm.rotateToPos(scoreRotPos);
                 pause(500);
                 arm.setArmPos(scoreExt2);
         }
     }
 
     public void scoreSample() {
-        thread.start();
+        scoreThread.start();
     }
 
     public void pause(long time) {
