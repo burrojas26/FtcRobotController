@@ -57,7 +57,7 @@ public class State extends LinearOpMode {
         rotator = hardwareMap.get(Servo.class, "rotate");
 
         // Initialize GoBilda Pinpoint driver for localization
-        pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
+        pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
 
         // Configure motor directions (ensuring forward movement aligns with joystick input)
         leftFront.setDirection(DcMotorEx.Direction.REVERSE);
