@@ -27,8 +27,8 @@ public class Arm {
 
     // Limits for servo rotation and extension
     double servoMax = 0.78; // Maximum servo position
-    double servoMin = 0.27; // Minimum servo position
-    int extensionMax = 2625; // Maximum extension position
+    double servoMin = 0.4833; // Minimum servo position
+    int extensionMax = 2600; // Maximum extension position
     int extSpeed = 4000; // Arm extension speed
 
     /**

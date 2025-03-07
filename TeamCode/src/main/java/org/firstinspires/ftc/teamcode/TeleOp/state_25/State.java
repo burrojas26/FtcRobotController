@@ -87,6 +87,9 @@ public class State extends LinearOpMode {
 
         waitForStart();
 
+        arm = new Arm(leftArm, rightArm, leftServo, rightServo, gamepad2);
+        arm.rotateToPos(0.60);
+
         // Set rotation of arm
         leftServo.setPosition(0.5);
         rightServo.setPosition(0.5);
@@ -124,7 +127,7 @@ public class State extends LinearOpMode {
             double newY = -strafe * Math.sin(robotHeading) + drive * Math.cos(robotHeading);
 
             // Initialize Arm control with hardware inputs
-            arm = new Arm(leftArm, rightArm, leftServo, rightServo, gamepad2);
+
 
             // Arm control logic
             if (gamepad2.right_stick_button && !oldGamepad2.right_stick_button) manual = !manual;
