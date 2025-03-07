@@ -60,8 +60,8 @@ public final class MecanumDrive {
                 RevHubOrientationOnRobot.UsbFacingDirection.LEFT;
 
         // drive model parameters
-        public double inPerTick = 1;
-        public double lateralInPerTick = inPerTick;
+        public double inPerTick = (79.0/26938);
+        public double lateralInPerTick = (78.625/-422);
         public double trackWidthTicks = 0;
 
         // feedforward parameters (in tick units)
@@ -233,8 +233,8 @@ public final class MecanumDrive {
         // TODO: reverse motor directions if needed
         //   leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
         leftFront.setDirection(DcMotorEx.Direction.REVERSE);
-        rightFront.setDirection(DcMotorEx.Direction.REVERSE);
-        leftBack.setDirection(DcMotorEx.Direction.FORWARD);
+        rightFront.setDirection(DcMotorEx.Direction.FORWARD);
+        leftBack.setDirection(DcMotorEx.Direction.REVERSE);
         rightBack.setDirection(DcMotorEx.Direction.FORWARD);
 
         // TODO: make sure your config has an IMU with this name (can be BNO or BHI)
