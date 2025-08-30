@@ -149,8 +149,12 @@ public class State extends LinearOpMode {
             // Initialize Auto control
             auto = new Auto(arm, intake);
 
+            // Pass the auto class into arm nd intake so we can override
+            arm.getAuto(auto);
+            intake.getAuto(auto);
+
             // Auto Controlled logic
-            if (gamepad2.dpad_down) auto.readyPickup();
+            if (gamepad2.dpad_down) auto.setState(Auto.State.READY_PICKUP);
             if (gamepad2.b && !btnB) {
                 if (pinch.getPosition() <= 0.02) {
                     intake.open();
@@ -160,8 +164,8 @@ public class State extends LinearOpMode {
                 }
             }
             btnB = gamepad2.b;
-            if (gamepad2.dpad_left) auto.getFromWall();
-            if (gamepad2.dpad_right) auto.scoreSample();
+            if (gamepad2.dpad_left) auto.setState(Auto.State.GET_FROM_WALL);
+            if (gamepad2.dpad_right) auto.setState(Auto.State.SCORE_SAMPLE);
 
             // Emergency stop triggered by back button
             if (gamepad1.back || gamepad2.back) stopAll();
@@ -193,6 +197,9 @@ public class State extends LinearOpMode {
             // Display telemetry data
             updateTelemetry(fieldCentric, manual);
 
+            // Run the auto action selected
+            auto.update();
+
             // Update the old gamepad settings
             oldGamepad1.copy(gamepad1);
             oldGamepad2.copy(gamepad2);
@@ -207,7 +214,7 @@ public class State extends LinearOpMode {
         percent = 0;
         arm.stopArm();
         intake.stopIntake();
-        auto.stopAll();
+        auto.setState(Auto.State.MANUAL);
         stopped = true;
     }
 

@@ -22,6 +22,8 @@ public class Arm {
     Servo leftServo;
     Servo rightServo;
 
+    Auto autoClass;
+
     // Gamepad for manual control
     Gamepad gamepad2;
 
@@ -48,6 +50,15 @@ public class Arm {
         this.gamepad2 = gamepad;
     }
 
+    public void getAuto(Auto autoClass) {
+        this.autoClass = autoClass;
+    }
+
+    public void overrideAuto() {
+        autoClass.setState(Auto.State.MANUAL);
+        autoClass.update();
+    }
+
     /**
      * Rotates the arm using the joystick input.
      * Adjusts the servo position based on joystick movement, within set limits.
@@ -55,23 +66,27 @@ public class Arm {
      * @param joyStick The joystick input value for rotation (-1 to 1).
      */
     public void rotateArm(double joyStick) {
+        overrideAuto();
         double newPos = leftServo.getPosition() + -joyStick * 0.003;
         rotateToPos(newPos);
     }
 
     public void rotateToPos(double newPos) {
     if (newPos <= servoMax && newPos >= servoMin) { // Ensuring the position is within bounds
+            overrideAuto();
             leftServo.setPosition(newPos);
             rightServo.setPosition(newPos);
         }
     }
 
     public void armUp() {
+        overrideAuto();
         leftServo.setPosition(0.5);
         rightServo.setPosition(0.5);
     }
 
     public void armDown() {
+        overrideAuto();
         leftServo.setPosition(servoMax);
         rightServo.setPosition(servoMax);
     }
@@ -81,11 +96,13 @@ public class Arm {
      * Sets both motors to move to the pre-defined extension limit.
      */
     public void extendArm() {
+        overrideAuto();
         setArmPos(extensionMax);
     }
 
     public void setArmPos(int newPos) {
         if (newPos <= extensionMax && newPos >= 0) {
+            overrideAuto();
             leftMotor.setTargetPosition(newPos);
             leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             rightMotor.setTargetPosition(newPos);
@@ -99,6 +116,7 @@ public class Arm {
      * Retracts the arm back to its starting position (0).
      */
     public void collapseArm() {
+        overrideAuto();
         leftMotor.setTargetPosition(0);
         leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightMotor.setTargetPosition(0);
@@ -111,6 +129,7 @@ public class Arm {
      * Stops the arm and holds position.
      */
     public void stopArm() {
+        overrideAuto();
         leftMotor.setTargetPosition(leftMotor.getCurrentPosition());
         leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightMotor.setTargetPosition(rightMotor.getCurrentPosition());
@@ -124,6 +143,7 @@ public class Arm {
      * The right stick's Y-axis adjusts the motor position within safe limits.
      */
     public void manual() {
+        overrideAuto();
         float increase = -gamepad2.right_stick_y * 500; // Convert joystick movement to motor steps
         int newPos = leftMotor.getCurrentPosition() + (int) increase;
         if (newPos < extensionMax && newPos > 0) { // Ensure within limits

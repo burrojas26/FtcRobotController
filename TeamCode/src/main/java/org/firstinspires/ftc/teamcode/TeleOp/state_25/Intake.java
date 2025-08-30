@@ -14,6 +14,8 @@ public class Intake {
     // Servos for intake control
     Servo pinch, rotate;
 
+    Auto autoClass;
+
     // Software limits for servos
     double pinchMax = 0.3;
     double pinchMin = 0;
@@ -31,6 +33,15 @@ public class Intake {
         this.rotate = rotate;
     }
 
+    public void getAuto(Auto autoClass) {
+        this.autoClass = autoClass;
+    }
+
+    public void overrideAuto() {
+        autoClass.setState(Auto.State.MANUAL);
+        autoClass.update();
+    }
+
     /**
      * Function to rotate the pinching servo based on two trigger inputs
      *
@@ -38,22 +49,26 @@ public class Intake {
      * @param triggerNeg The trigger value to use as counter clockwise rotation
      */
     public void pinch(float triggerPos, float triggerNeg) {
+        overrideAuto();
         double newPos = pinch.getPosition() + (triggerPos-triggerNeg)*0.008;
         pinchToPos(newPos);
     }
 
     public void pinchToPos(double newPos) {
         if (newPos <= pinchMax && newPos >= pinchMin) {
+            overrideAuto();
             pinch.setPosition(newPos);
         }
     }
 
     public void open() {
+        overrideAuto();
         pinchToPos(pinchMax);
     }
 
     public void close() {
         double closePos = 0;
+        overrideAuto();
         pinchToPos(closePos);
     }
 
@@ -63,12 +78,14 @@ public class Intake {
      * @param joyStick The value from the joystick controlling rotation
      */
     public void rotate(double joyStick) {
+        overrideAuto();
         double newPos = rotate.getPosition() + joyStick*0.005;
         rotateToPos(newPos);
     }
 
     public void rotateToPos(double newPos) {
         if (newPos < rotateMax && newPos > rotateMin) {
+            overrideAuto();
             rotate.setPosition(newPos);
         }
     }
@@ -77,6 +94,7 @@ public class Intake {
      * Function to stop all moving parts
      */
     public void stopIntake() {
+        overrideAuto();
         pinch.setPosition(pinch.getPosition());
         rotate.setPosition(rotate.getPosition());
     }

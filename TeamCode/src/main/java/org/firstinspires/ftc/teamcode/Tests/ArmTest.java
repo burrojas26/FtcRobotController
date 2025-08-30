@@ -5,6 +5,7 @@
 
 package org.firstinspires.ftc.teamcode.Tests;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -13,15 +14,23 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.TeleOp.state_25.Arm;
+import org.firstinspires.ftc.teamcode.TeleOp.state_25.Auto;
+import org.firstinspires.ftc.teamcode.TeleOp.state_25.Intake;
 
+// This class is broken rn and not needed
+@Disabled
 @TeleOp(name="Arm Test", group="Linear OpMode")
 public class ArmTest extends LinearOpMode {
 
     // Robot hardware variables
     DcMotorEx leftArm, rightArm; // Arm motors
     Servo leftServo, rightServo; // Arm rotation servos
+    Servo pinch, rotator; // Intake servos
 
     Arm arm;
+
+    Intake intake = new Intake(pinch, rotator);
+    Auto auto = new Auto(arm, intake);
 
     @Override
     public void runOpMode() {
@@ -30,6 +39,9 @@ public class ArmTest extends LinearOpMode {
         rightArm = hardwareMap.get(DcMotorEx.class, "rightArm");
         leftServo = hardwareMap.get(Servo.class, "leftServo");
         rightServo = hardwareMap.get(Servo.class, "rightServo");
+        // Initialize intake servos
+        pinch = hardwareMap.get(Servo.class, "pinch");
+        rotator = hardwareMap.get(Servo.class, "rotate");
 
         waitForStart();
 

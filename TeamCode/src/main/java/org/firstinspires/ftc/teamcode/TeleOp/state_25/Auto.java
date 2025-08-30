@@ -3,22 +3,18 @@ package org.firstinspires.ftc.teamcode.TeleOp.state_25;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class Auto {
     // The classes for control
     Arm arm;
     Intake intake;
 
-    scoreFn scorer = new scoreFn();
-    Thread scoreThread = new Thread(scorer);
+    //Enum for actions
+    enum State {GET_FROM_WALL, READY_PICKUP, SCORE_SAMPLE, MANUAL}
+    State currentState = State.MANUAL;
 
-    readyFn ready = new readyFn();
-    Thread readyThread = new Thread(ready);
-
-    fromWallFn fromWall = new fromWallFn();
-    Thread wallThread = new Thread(fromWall);
-
-    boolean stopped = false;
+    ElapsedTime timer = new ElapsedTime();
 
     /**
      * Constructor to initialize the Arm with motors, servos, and a gamepad.
@@ -31,69 +27,53 @@ public class Auto {
         this.intake = intake;
     }
 
-    class fromWallFn implements Runnable {
-        @Override
-        public void run() {
-            double armPos = 0.7361;
-            double rotPos = 0.2072;
-            double pinchPos = 0.1972;
-            arm.rotateToPos(armPos);
-            intake.rotateToPos(rotPos);
-            intake.pinchToPos(pinchPos);
-        }
+    public void setState(State state) {
+        currentState = state;
+        timer.reset();
     }
 
-    public void getFromWall() {
-        wallThread.start();
-    }
+    public void update() {
+        switch (currentState) {
+            case MANUAL:
+                break;
+            case GET_FROM_WALL:
+                double armPos = 0.7361;
+                double rotPos = 0.2072;
+                double pinchPos = 0.1972;
 
-    class readyFn implements Runnable {
-        @Override
-        public void run() {
-            double wristPos = 0.2633;
-            double rotPos = 0.76;
-            intake.rotateToPos(wristPos);
-            intake.open();
-            arm.rotateToPos(rotPos);
-        }
-    }
+                arm.rotateToPos(armPos);
+                intake.rotateToPos(rotPos);
+                intake.pinchToPos(pinchPos);
 
-    public void readyPickup() {
-        readyThread.start();
-    }
 
-    class scoreFn implements Runnable {
-        @Override
-        public void run() {
+                break;
+            case READY_PICKUP:
+                double wristPos = 0.2633;
+                double rotPos2 = 0.76;
+                intake.rotateToPos(wristPos);
+                intake.open();
+                arm.rotateToPos(rotPos2);
+
+
+                break;
+            case SCORE_SAMPLE:
                 int scoreExt = 1230;
                 int scoreExt2 = 422;
                 double scoreRotPos = 0.5889;
                 double scoreWristPos = 0.2689;
                 intake.rotateToPos(scoreWristPos);
-                pause(500);
-                arm.setArmPos(scoreExt);
-                pause(600);
-                arm.rotateToPos(scoreRotPos);
-                pause(500);
-                arm.setArmPos(scoreExt2);
+                if (timer.milliseconds() > 500) {
+                    arm.setArmPos(scoreExt);
+                }
+                if (timer.milliseconds() > 1100) {
+                    arm.rotateToPos(scoreRotPos);
+                }
+                if (timer.milliseconds() > 1600) {
+                    arm.setArmPos(scoreExt2);
+                }
+
+                break;
         }
-    }
-
-    public void scoreSample() {
-        scoreThread.start();
-    }
-
-    public void pause(long time) {
-        try {
-            // Sleep for 2 seconds (2000 milliseconds)
-            Thread.sleep(time);
-        } catch (InterruptedException e) {
-            System.out.println("Thread was interrupted!");
-        }
-    }
-
-    public void stopAll() {
-        stopped = true;
     }
 
 }
