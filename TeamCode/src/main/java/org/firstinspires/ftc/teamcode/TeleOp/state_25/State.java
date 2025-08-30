@@ -191,6 +191,7 @@ public class State extends LinearOpMode {
             double x = fieldCentric ? newX : strafe;
             double y = fieldCentric ? newY : drive;
 
+
             // Execute driving function
             drive(y, x, rotate, percent);
 
@@ -227,11 +228,29 @@ public class State extends LinearOpMode {
      * @param percent Power percentage to scale movement
      */
     public void drive(double drive, double strafe, double rotate, double percent) {
+        double frontLeftPower = drive + strafe + rotate;
+        double frontRightPower = -drive + strafe + rotate;
+        double backLeftPower = -drive + strafe - rotate;
+        double backRightPower = drive + strafe - rotate;
+
+        // Normalize the values so no value exceeds 1.0
+        double max = Math.max(Math.abs(frontLeftPower), Math.abs(frontRightPower));
+        max = Math.max(max, Math.abs(backLeftPower));
+        max = Math.max(max, Math.abs(backRightPower));
+
         double scale = percent / 100;
-        leftFront.setPower(scale * (drive + strafe + rotate));
-        rightFront.setPower(scale * (-drive + strafe + rotate));
-        leftBack.setPower(scale * (-drive + strafe - rotate));
-        rightBack.setPower(scale * (drive + strafe - rotate));
+
+        if (max > 1.0) {
+            frontLeftPower /= max;
+            frontRightPower /= max;
+            backLeftPower /= max;
+            backRightPower /= max;
+        }
+
+        leftFront.setPower(scale * frontLeftPower);
+        rightFront.setPower(scale * frontRightPower);
+        leftBack.setPower(scale * backLeftPower);
+        rightBack.setPower(scale * backRightPower);
     }
 
     /**
